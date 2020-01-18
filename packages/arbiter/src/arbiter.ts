@@ -5,6 +5,7 @@ import * as Core from '@linfra/core';
 import { Interfaces } from './shared';
 
 const FSHelper = Core.Helpers.FSHelper;
+const TreeModule = Core.TreeModule;
 
 export class Arbiter {
   /**
@@ -15,6 +16,60 @@ export class Arbiter {
   static create (): Arbiter {
     const inst = new Arbiter();
     return inst;
+  }
+
+  /**
+   * Builds tree nodes for each package from args.
+   *
+   * @param  {Interfaces.PackageJSON[]} packageJSONs
+   * @return {Core.TreeModule.TreeNode<Interfaces.PackageJSON>[]}
+   */
+  private buildTreeNodesOfPackages (
+    packageJSONs: Interfaces.PackageJSON[],
+  ): Core.TreeModule.TreeNode<Interfaces.PackageJSON>[] {
+    const treeNodeForOwnPackages = _.map(packageJSONs, (packageJSON) => {
+      const treeNodeForOwnPackage = new TreeModule.TreeNode(packageJSON);
+      return treeNodeForOwnPackage;
+    });
+
+    _.forEach(treeNodeForOwnPackages, (treeNodeForOwnPackage) => {
+      this.bindTreeNodesOfPackages(treeNodeForOwnPackage, treeNodeForOwnPackages);
+    });
+
+    return treeNodeForOwnPackages;
+  }
+
+  /**
+   * Binds tree nodes of packages to the tree node of selected package.
+   *
+   * @mutable - change the list of node's children of selected package
+   * @param  {Core.TreeModule.TreeNode<Interfaces.PackageJSON>} treeNodeForCurPackage
+   * @param  {Core.TreeModule.TreeNode<Interfaces.PackageJSON>} treeNodeForOwnPackages
+   * @return {void}
+   */
+  private bindTreeNodesOfPackages (
+    treeNodeForCurPackage: Core.TreeModule.TreeNode<Interfaces.PackageJSON>,
+    treeNodeForOwnPackages: Core.TreeModule.TreeNode<Interfaces.PackageJSON>[],
+  ): void {
+    const curPackage = treeNodeForCurPackage.value;
+
+    _.forEach(treeNodeForOwnPackages, (treeNodeForOwnPackage) => {
+      const onwPackage = treeNodeForOwnPackage.value;
+      if (onwPackage.name === curPackage.name) {
+        return;
+      }
+
+      const depPackagesNames = Object.keys(curPackage.dependencies);
+      const indexOfPackage = _.findIndex(depPackagesNames, (key) => {
+        return key === onwPackage.name;
+      });
+
+      if (indexOfPackage === -1) {
+        return;
+      }
+
+      treeNodeForCurPackage.addChild(treeNodeForOwnPackage, `name`);
+    });
   }
 
   /**
