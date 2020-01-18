@@ -5,6 +5,7 @@
   "main": "./dist/index.js",
   "scripts": {
     "dev:tasks": "gulp --gulpfile=./gulp.dev.js --tasks",
+    "dev:build": "gulp --gulpfile=./gulp.dev.js build",
     "dev:watch": "gulp --gulpfile=./gulp.dev.js build:watch",
     "dev:test": "gulp --gulpfile=./gulp.dev.js test:watch",
     "dev:clear:dist": "gulp --gulpfile=./gulp.dev.js clear:dist",
