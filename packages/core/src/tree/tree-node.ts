@@ -1,40 +1,113 @@
 import * as _ from 'lodash';
 
-export class TreeNode<T = any> {
-  private _parent!: TreeNode<T>;
-  public get parent (): TreeNode<T> {
+export class TreeNode<TNData = any> {
+  private _parent!: TreeNode<TNData>;
+  public get parent (): TreeNode<TNData> {
     return this._parent;
   }
-  public set parent (parentNode: TreeNode<T>) {
+  public set parent (parentNode: TreeNode<TNData>) {
     this._parent = parentNode;
   }
 
-  private _children!: TreeNode<T>[];
-  public get children (): TreeNode<T>[] {
+  private _children!: TreeNode<TNData>[];
+  public get children (): TreeNode<TNData>[] {
     return [ ...this._children ];
   }
 
-  private _value: T;
-  public get value (): T {
+  private _value: TNData;
+  public get value (): TNData {
     return this._value;
   }
-  public set value (newValue: T) {
+  public set value (newValue: TNData) {
     this._value = newValue;
   }
 
-  constructor (value: T) {
+  constructor (value: TNData) {
     this._value = value;
     this._children = [];
   }
 
   /**
-   * Sets the list of node of children.
+   * Add node to the list of node's children.
    *
-   * @param  {TreeNode[]} children
+   * @param  {TreeNode<TNData>} newChild
+   * @param  {string|Symbol} [idFieldName] - name of field with id
    * @returns void
    */
-  public setChildren (children: TreeNode<T>[]): void {
-    this._children = [ ...children ];
+  public addChild (
+    newChild: TreeNode<TNData>,
+    idFieldName?: string | symbol,
+  ): void {
+
+    if (!_.isNil(idFieldName)) {
+      if (!_.isString(idFieldName) && !_.isSymbol(idFieldName)) {
+        throw new Error(`Id feild name must be a string or a symbol`);
+      }
+
+      if (_.isString(idFieldName) && idFieldName === ``) {
+        throw new Error(`String id feild name must be a non-empty string`);
+      }
+    }
+
+    const newChildValue: any = newChild.value;
+    if (!_.isNil(idFieldName) && !_.isObject(newChildValue)) {
+      throw new Error(`Tree Node Data must be an object type`);
+    }
+
+    const oldChild = _.isNil(idFieldName)
+      ? _.find(this._children, (child) => {
+        return child === newChild;
+      })
+      : _.find(this._children, (child) => {
+        const childData: any = child.value;
+        return childData[idFieldName] === newChildValue[idFieldName];
+      });
+
+    if (!_.isNil(oldChild)) {
+      return;
+    }
+
+    this._children.push(newChild);
+  }
+
+  /**
+   * Remove node from the list of node's children.
+   *
+   * @param  {TreeNode<TNData>} childForRemoving
+   * @param  {string|Symbol} [idFieldName] - name of field with id
+   * @returns void
+   */
+  public removeChild (
+    childForRemoving: TreeNode<TNData>,
+    idFieldName?: string | symbol,
+  ): void {
+
+    if (!_.isNil(idFieldName)) {
+      if (!_.isString(idFieldName) && !_.isSymbol(idFieldName)) {
+        throw new Error(`Id feild name must be a string or a symbol`);
+      }
+
+      if (_.isString(idFieldName) && idFieldName === ``) {
+        throw new Error(`String id feild name must be a non-empty string`);
+      }
+    }
+
+    const newChildValue: any = childForRemoving.value;
+    if (!_.isNil(idFieldName) && !_.isObject(newChildValue)) {
+      throw new Error(`Tree Node Data must be an object type`);
+    }
+
+    if (_.isNil(idFieldName)) {
+      _.remove(this._children, (child) => {
+        return child === childForRemoving;
+      });
+      return;
+    }
+
+    _.remove(this._children, (child) => {
+      const childData: any = child.value;
+      return childData[idFieldName] === newChildValue[idFieldName];
+    });
   }
 
   /**
@@ -43,9 +116,7 @@ export class TreeNode<T = any> {
    * @param  {TreeNode[]} children
    * @returns void
    */
-  public removeChild (childForRemoving: TreeNode<T>): void {
-    this._children = _.reject(this._children, (child) => {
-      return child === childForRemoving;
-    });
+  public setChildren (children: TreeNode<TNData>[]): void {
+    this._children = [ ...children ];
   }
 }
