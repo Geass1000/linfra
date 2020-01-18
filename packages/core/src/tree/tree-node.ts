@@ -28,12 +28,36 @@ export class TreeNode<TNData = any> {
   }
 
   /**
-   * Returns true if list of node's children isn't empty and else otherwise.
+   * Returns true if list of node's children isn't empty and false otherwise.
    *
    * @return {boolean}
    */
   hasChildren (): boolean {
     return !_.isEmpty(this._children);
+  }
+
+  /**
+   * Returns true if list of node's children has child and false otherwise.
+   *
+   * @return {boolean}
+   */
+  hasChild (
+    childForSearch: TreeNode<TNData>,
+    idFieldName?: string | symbol,
+  ): boolean {
+    this.checkSearchParams(childForSearch, idFieldName);
+
+    const childForFindingValue: any = childForSearch.value;
+    const oldChild = _.isNil(idFieldName)
+      ? _.find(this._children, (child) => {
+        return child === childForSearch;
+      })
+      : _.find(this._children, (child) => {
+        const childData: any = child.value;
+        return childData[idFieldName] === childForFindingValue[idFieldName];
+      });
+
+    return !_.isNil(oldChild);
   }
 
   /**
@@ -47,32 +71,7 @@ export class TreeNode<TNData = any> {
     newChild: TreeNode<TNData>,
     idFieldName?: string | symbol,
   ): void {
-
-    if (!_.isNil(idFieldName)) {
-      if (!_.isString(idFieldName) && !_.isSymbol(idFieldName)) {
-        throw new Error(`Id feild name must be a string or a symbol`);
-      }
-
-      if (_.isString(idFieldName) && idFieldName === ``) {
-        throw new Error(`String id feild name must be a non-empty string`);
-      }
-    }
-
-    const newChildValue: any = newChild.value;
-    if (!_.isNil(idFieldName) && !_.isObject(newChildValue)) {
-      throw new Error(`Tree Node Data must be an object type`);
-    }
-
-    const oldChild = _.isNil(idFieldName)
-      ? _.find(this._children, (child) => {
-        return child === newChild;
-      })
-      : _.find(this._children, (child) => {
-        const childData: any = child.value;
-        return childData[idFieldName] === newChildValue[idFieldName];
-      });
-
-    if (!_.isNil(oldChild)) {
+    if (this.hasChild(newChild, idFieldName)) {
       return;
     }
 
@@ -90,21 +89,7 @@ export class TreeNode<TNData = any> {
     childForRemoving: TreeNode<TNData>,
     idFieldName?: string | symbol,
   ): void {
-
-    if (!_.isNil(idFieldName)) {
-      if (!_.isString(idFieldName) && !_.isSymbol(idFieldName)) {
-        throw new Error(`Id feild name must be a string or a symbol`);
-      }
-
-      if (_.isString(idFieldName) && idFieldName === ``) {
-        throw new Error(`String id feild name must be a non-empty string`);
-      }
-    }
-
-    const newChildValue: any = childForRemoving.value;
-    if (!_.isNil(idFieldName) && !_.isObject(newChildValue)) {
-      throw new Error(`Tree Node Data must be an object type`);
-    }
+    this.checkSearchParams(childForRemoving, idFieldName);
 
     if (_.isNil(idFieldName)) {
       _.remove(this._children, (child) => {
@@ -113,9 +98,10 @@ export class TreeNode<TNData = any> {
       return;
     }
 
+    const childForRemovingValue: any = childForRemoving.value;
     _.remove(this._children, (child) => {
       const childData: any = child.value;
-      return childData[idFieldName] === newChildValue[idFieldName];
+      return childData[idFieldName] === childForRemovingValue[idFieldName];
     });
   }
 
@@ -127,5 +113,32 @@ export class TreeNode<TNData = any> {
    */
   public setChildren (children: TreeNode<TNData>[]): void {
     this._children = [ ...children ];
+  }
+
+  /**
+   * Throws an error if search params are invalid.
+   *
+   * @param  {TreeNode<TNData>} child
+   * @param  {string|Symbol} [idFieldName] - name of field with id
+   * @return {void}
+   */
+  private checkSearchParams (
+    child: TreeNode<TNData>,
+    idFieldName?: string | symbol,
+  ): void {
+    if (!_.isNil(idFieldName)) {
+      if (!_.isString(idFieldName) && !_.isSymbol(idFieldName)) {
+        throw new Error(`Id feild name must be a string or a symbol`);
+      }
+
+      if (_.isString(idFieldName) && idFieldName === ``) {
+        throw new Error(`String id feild name must be a non-empty string`);
+      }
+    }
+
+    const childValue: any = child.value;
+    if (!_.isNil(idFieldName) && !_.isObject(childValue)) {
+      throw new Error(`Tree Node Data must be an object type`);
+    }
   }
 }
