@@ -3,11 +3,12 @@
   "version": "0.0.0",
   "description": "linfra",
   "scripts": {
+    "postinstall": "npm run lerna:bootstrap",
     "lerna:bootstrap": "lerna bootstrap",
     "lerna:clean": "lerna clean --yes",
     "gulp:tasks": "gulp --tasks",
-    "prod:build": "lerna run --parallel pkg:build && lerna run --parallel prod:build && gulp build",
-    "dev:watch": "lerna run --parallel dev:watch"
+    "build": "lerna run --parallel pkg:build --scope @linfra/core && lerna run --parallel pkg:build --ignore @linfra/core",
+    "dev:watch": "npm run build && lerna run --parallel dev:watch"
   },
   "repository": {
     "type": "git",
