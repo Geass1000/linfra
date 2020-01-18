@@ -37,7 +37,7 @@ exports[`build:src`] = gulp.series(
 
 exports[`build`] = gulp.series(
   exports[`eslint`],
-  exports[`clear:test`],
+  exports[`clear:dist`],
   exports[`build:src`],
 );
 

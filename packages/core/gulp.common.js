@@ -7,7 +7,7 @@ const sourceFolder = `./src`;
 const distFolder = `./dist`;
 
 exports[`clear:dist`] = async function clearDistTask () {
-  const delResult = await del([ `${distFolder}/*` ], { force: true });
+  const delResult = await del([ `${distFolder}/*`, `!${distFolder}/index.d.ts` ], { force: true });
   return delResult;
 };
 
