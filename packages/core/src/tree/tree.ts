@@ -1,21 +1,21 @@
 import { TreeNode } from './tree-node';
 import { PostorderIterator, PreorderIterator } from './interators';
 
-export class Tree<TN> {
-  public get root (): TreeNode<TN> {
+export class Tree<TNData = any> {
+  public get root (): TreeNode<TNData> {
     return this.rootNode;
   }
 
   constructor (
-    private rootNode: TreeNode<TN>,
+    private rootNode: TreeNode<TNData>,
   ) { }
 
-  public getPreorderIterator (): PreorderIterator<TN> {
-    return new PreorderIterator<TN>(this.root);
+  public getPreorderIterator (): PreorderIterator<TNData> {
+    return new PreorderIterator<TNData>(this.root);
   }
 
-  public getPostorderIterator (): PostorderIterator<TN> {
-    return new PostorderIterator<TN>(this.root);
+  public getPostorderIterator (): PostorderIterator<TNData> {
+    return new PostorderIterator<TNData>(this.root);
   }
 
   public getInorderIterator (): any {
