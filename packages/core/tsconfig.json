@@ -9,7 +9,7 @@
     "strictNullChecks": false,
     "noImplicitAny": true,
     "moduleResolution": "node",
-    "removeComments": true,
+    "removeComments": false,
     "target": "es6",
     "typeRoots": [
       "node_modules/@types"
