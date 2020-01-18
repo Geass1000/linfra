@@ -7,8 +7,9 @@
     "lerna:bootstrap": "lerna bootstrap",
     "lerna:clean": "lerna clean --yes",
     "gulp:tasks": "gulp --tasks",
-    "build": "lerna run --parallel pkg:build --scope @linfra/core && lerna run --parallel pkg:build --ignore @linfra/core",
-    "dev:watch": "npm run build && lerna run --parallel dev:watch"
+    "dev:build": "lerna run --parallel dev:build --scope @linfra/core && lerna run --parallel dev:build --ignore @linfra/core",
+    "dev:watch": "npm run dev:build && lerna run --parallel dev:watch",
+    "pkg:build": "lerna run --parallel pkg:build --scope @linfra/core && lerna run --parallel pkg:build --ignore @linfra/core"
   },
   "repository": {
     "type": "git",
