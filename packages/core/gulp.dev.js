@@ -42,7 +42,6 @@ exports[`build`] = gulp.series(
 );
 
 exports[`build:watch`] = gulp.series(
-  exports[`build`],
   function buildWatchTask () {
     return gulp.watch([
       `${sourceFolder}/**/*.ts`,
