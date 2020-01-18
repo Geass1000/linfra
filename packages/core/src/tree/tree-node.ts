@@ -28,6 +28,15 @@ export class TreeNode<TNData = any> {
   }
 
   /**
+   * Returns true if list of node's children isn't empty and else otherwise.
+   *
+   * @return {boolean}
+   */
+  hasChildren (): boolean {
+    return !_.isEmpty(this._children);
+  }
+
+  /**
    * Add node to the list of node's children.
    *
    * @param  {TreeNode<TNData>} newChild
