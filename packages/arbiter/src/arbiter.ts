@@ -19,6 +19,45 @@ export class Arbiter {
   }
 
   /**
+   * Returns true if packages have circular dependencies and false otherwise.
+   *
+   * @param  {Interfaces.PackageJSON[]} packageJSONs
+   * @return {boolean}
+   */
+  packagesHasCircularDependencies (
+    packageJSONs: Interfaces.PackageJSON[],
+  ): boolean {
+    const treeNodeForOwnPackages = this.buildTreeNodesOfPackages(packageJSONs);
+
+    while (!_.isEmpty(treeNodeForOwnPackages)) {
+      const nodeWithoutDeps = _.find(treeNodeForOwnPackages, (treeNodeForOwnPackage) => {
+        const nodeHasChildren = treeNodeForOwnPackage.hasChildren();
+        return nodeHasChildren === false;
+      });
+
+      if (_.isNil(nodeWithoutDeps)) {
+        return true;
+      }
+
+      _.forEach(treeNodeForOwnPackages, (treeNodeForOwnPackage) => {
+        if (treeNodeForOwnPackage === nodeWithoutDeps) {
+          return;
+        }
+
+        if (treeNodeForOwnPackage.hasChild(nodeWithoutDeps) === false) {
+          return;
+        }
+
+        treeNodeForOwnPackage.removeChild(nodeWithoutDeps);
+      });
+
+      _.remove(treeNodeForOwnPackages, nodeWithoutDeps);
+    }
+
+    return false;
+  }
+
+  /**
    * Builds tree nodes for each package from args.
    *
    * @param  {Interfaces.PackageJSON[]} packageJSONs
