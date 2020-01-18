@@ -1,0 +1,11 @@
+{
+  "command": {
+    "version": {
+      "message": "chore(project): publish %s"
+    }
+  },
+  "packages": [
+    "packages/*"
+  ],
+  "version": "0.0.0"
+}
