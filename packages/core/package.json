@@ -18,20 +18,21 @@
     "lodash": "^4.17.15"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.145",
     "@types/chai": "^4.2.7",
+    "@types/lodash": "^4.14.145",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.12.6",
     "@types/sinon": "^7.5.0",
     "@typescript-eslint/eslint-plugin": "^2.6.1",
     "@typescript-eslint/parser": "^2.6.1",
+    "chai": "^4.2.0",
     "del": "^5.1.0",
     "eslint": "^6.6.0",
     "gulp": "^4.0.2",
+    "gulp-cli": "^2.2.0",
     "gulp-eslint": "^6.0.0",
     "gulp-mocha": "^7.0.2",
     "gulp-typescript": "^5.0.1",
-    "chai": "^4.2.0",
     "mocha": "^6.2.2",
     "sinon": "^7.5.0",
     "typescript": "^3.7.2"

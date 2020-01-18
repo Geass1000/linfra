@@ -1,16 +1,19 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 const gulp = require(`gulp`);
 const ts = require(`gulp-typescript`);
+const _ = require(`lodash`);
 
 const sourceFolder = `./src`;
 const distFolder = `./dist`;
 
 const GulpCommon = require(`./gulp.common`);
-const { GulpHelper } = require(`../../bootstrap/helpers/gulp.helper`);
 
-module.exports = GulpHelper.combineGulpFiles(
-  GulpCommon,
-);
+module.exports = _.reduce([ GulpCommon ], (partOfGulpModule, gulpFile) => {
+  return {
+    ...partOfGulpModule,
+    ...gulpFile,
+  };
+}, {});
 exports = module.exports;
 
 /**
