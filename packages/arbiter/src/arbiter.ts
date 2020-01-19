@@ -39,22 +39,40 @@ export class Arbiter {
         return true;
       }
 
-      _.forEach(treeNodeForOwnPackages, (treeNodeForOwnPackage) => {
-        if (treeNodeForOwnPackage === nodeWithoutDeps) {
-          return;
-        }
-
-        if (treeNodeForOwnPackage.hasChild(nodeWithoutDeps) === false) {
-          return;
-        }
-
-        treeNodeForOwnPackage.removeChild(nodeWithoutDeps);
-      });
-
-      _.remove(treeNodeForOwnPackages, nodeWithoutDeps);
+      this.removeTreeNodeFromTreeNodeList(
+        nodeWithoutDeps,
+        treeNodeForOwnPackages,
+      );
     }
 
     return false;
+  }
+
+  /**
+   * Removes tree node of current package from the list of tree nodes of packages.
+   *
+   * @mutable - change the list of node's children of selected package
+   * @param  {Core.TreeModule.TreeNode<Interfaces.PackageJSON>} curTreeNode
+   * @param  {Core.TreeModule.TreeNode<Interfaces.PackageJSON>} treeNodeList
+   * @return {void}
+   */
+  private removeTreeNodeFromTreeNodeList (
+    curTreeNode: Core.TreeModule.TreeNode<Interfaces.PackageJSON>,
+    treeNodeList: Core.TreeModule.TreeNode<Interfaces.PackageJSON>[],
+  ): void {
+    _.forEach(treeNodeList, (treeNode) => {
+      if (treeNode === curTreeNode) {
+        return;
+      }
+
+      if (treeNode.hasChild(curTreeNode) === false) {
+        return;
+      }
+
+      treeNode.removeChild(curTreeNode);
+    });
+
+    _.remove(treeNodeList, curTreeNode);
   }
 
   /**
