@@ -19,12 +19,45 @@ export class Arbiter {
   }
 
   /**
+   * Creates a list of pipeline levels. Each level depends on the previous level and
+   * can be processed only if the previous level has been processed. Items from one level can
+   * be processed concurrently.
+   *
+   * @param  {Interfaces.PackageJSON[]} packageJSONs
+   * @return {Interfaces.PackageJSON[][]}
+   */
+  private buildPipelineLevels (
+    packageJSONs: Interfaces.PackageJSON[],
+  ): Interfaces.PackageJSON[][] {
+    const treeNodeForOwnPackages = this.buildTreeNodesOfPackages(packageJSONs);
+
+    const pipelineLevels: Interfaces.PackageJSON[][] = [];
+    while (!_.isEmpty(treeNodeForOwnPackages)) {
+      const pipelineLevelNodes = _.filter(treeNodeForOwnPackages, (treeNodeForOwnPackage) => {
+        return treeNodeForOwnPackage.hasChildren() === false;
+      });
+
+      const pipelineLevel = _.map(pipelineLevelNodes, (pipelineLevelNode) => {
+        this.removeTreeNodeFromTreeNodeList(
+          pipelineLevelNode,
+          treeNodeForOwnPackages,
+        );
+
+        return pipelineLevelNode.value;
+      });
+
+      pipelineLevels.push(pipelineLevel);
+    }
+    return pipelineLevels;
+  }
+
+  /**
    * Returns true if packages have circular dependencies and false otherwise.
    *
    * @param  {Interfaces.PackageJSON[]} packageJSONs
    * @return {boolean}
    */
-  packagesHasCircularDependencies (
+  private packagesHasCircularDependencies (
     packageJSONs: Interfaces.PackageJSON[],
   ): boolean {
     const treeNodeForOwnPackages = this.buildTreeNodesOfPackages(packageJSONs);
