@@ -19,6 +19,39 @@ export class Arbiter {
   }
 
   /**
+   * Create copy of package.json config with linfra dependencies for each package.
+   *
+   * @param  {Interfaces.PackageJSON[]} packageJSONs
+   * @return {Interfaces.PackageJSON[]}
+   */
+  private buildLinfraPackageJSONs (
+    packageJSONs: Interfaces.PackageJSON[],
+  ): Interfaces.PackageJSON[] {
+    const treeNodeForOwnPackages = this.buildTreeNodesOfPackages(packageJSONs);
+
+    const linfraPackageJSONs = _.map(treeNodeForOwnPackages, (treeNodeForOwnPackage) => {
+      const ownPackageJSON = treeNodeForOwnPackage.value;
+
+      const linfraDependencies = _.map(treeNodeForOwnPackage.children, (childNode) => {
+        const childPackageJson = childNode.value;
+        return {
+          name: childPackageJson.name,
+          linfra: {
+            ...childPackageJson.linfra,
+          },
+        } as Interfaces.LinfraDependency;
+      });
+
+      return {
+        ...ownPackageJSON,
+        linfraDeps: linfraDependencies,
+      };
+    });
+
+    return linfraPackageJSONs;
+  }
+
+  /**
    * Creates a list of pipeline levels. Each level depends on the previous level and
    * can be processed only if the previous level has been processed. Items from one level can
    * be processed concurrently.
