@@ -132,7 +132,16 @@ export class Arbiter {
 
       try {
         const packageJSON: Interfaces.PackageJSON = JSON.parse(packageJSONFile);
-        packageJSONs.push(packageJSON);
+
+        const folderName = FSHelper.getFileNameByPath(packageFolderPath);
+        const packageJSONWithLinfraMetadata = {
+          ...packageJSON,
+          linfra: {
+            folderName: folderName,
+            pathToFolder: packageFolderPath,
+          },
+        };
+        packageJSONs.push(packageJSONWithLinfraMetadata);
       } catch (error) {
         console.warn(`Arbiter - buildDependencyPipeline:`,
           `Package JSON file (${pathToPackageJSONInPackage}) has an invalid JSON structure`);
