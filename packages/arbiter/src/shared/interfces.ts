@@ -11,5 +11,4 @@ export interface LinfraModule {
   folderName: string;
   pathToFolder: string;
   packageJSON: PackageJSON;
-  deps?: LinfraModule[];
 }
