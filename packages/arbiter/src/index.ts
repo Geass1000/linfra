@@ -1,1 +1,1 @@
-export * from './arbiter';
+export * from './pipeline';
