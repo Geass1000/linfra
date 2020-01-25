@@ -4,18 +4,48 @@ import * as Core from '@linfra/core';
 
 import { Interfaces } from './shared';
 
+import { Pipeline } from './pipeline';
+
 const FSHelper = Core.Helpers.FSHelper;
 const GraphModule = Core.GraphModule;
 
-export class Arbiter {
+export class PipelineBuilder {
   /**
-   * Create instance of Arbiter class.
+   * Create instance of PipelineBuilder class.
    *
-   * @return {Arbiter}
+   * @return {PipelineBuilder}
    */
-  static create (): Arbiter {
-    const inst = new Arbiter();
+  static create (): PipelineBuilder {
+    const inst = new PipelineBuilder();
     return inst;
+  }
+
+  /**
+   * Create Linfra Pipeline for folder with packages.
+   *
+   * @param  {string} folderPath
+   * @return {Pipeline}
+   */
+  buildPipeline (
+    folderPath: string,
+  ): Pipeline {
+    const isFolder = FSHelper.isDirectory(folderPath);
+    if (!isFolder) {
+      throw new Error(`Folder by path doesn't exist`);
+    }
+
+    const linfraModules = this.getLinfraModules(folderPath);
+    if (this.packagesHasCircularDependencies(linfraModules)) {
+      throw new Error(`Folder has circular dependencies`);
+    }
+
+    const pipelineLevels = this.buildPipelineLevels(linfraModules);
+    const lmNodes = this.buildListOfLMNodes(linfraModules);
+
+    const pipeline = Pipeline.create();
+    pipeline.setPipelineLevels(pipelineLevels);
+    pipeline.setListOfLMNodes(lmNodes);
+    return pipeline;
   }
 
   /**
@@ -193,7 +223,7 @@ export class Arbiter {
         };
         linfraModules.push(linfraModule);
       } catch (error) {
-        console.warn(`Arbiter - getLinfraModules:`,
+        console.warn(`PipelineBuilder - getLinfraModules:`,
           `Package JSON file (${pathToLinfraModuleInPackage}) has an invalid JSON structure`);
         return null;
       }
