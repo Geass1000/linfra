@@ -21,34 +21,29 @@ export class Arbiter {
   /**
    * Create copy of package.json config with linfra dependencies for each package.
    *
-   * @param  {Interfaces.PackageJSON[]} packageJSONs
-   * @return {Interfaces.PackageJSON[]}
+   * @param  {Interfaces.LinfraModule[]} packageJSONs
+   * @return {Interfaces.LinfraModule[]}
    */
-  private buildLinfraPackageJSONs (
-    packageJSONs: Interfaces.PackageJSON[],
-  ): Interfaces.PackageJSON[] {
+  private buildLinfraLinfraModules (
+    packageJSONs: Interfaces.LinfraModule[],
+  ): Interfaces.LinfraModule[] {
     const treeNodeForOwnPackages = this.buildTreeNodesOfPackages(packageJSONs);
 
-    const linfraPackageJSONs = _.map(treeNodeForOwnPackages, (treeNodeForOwnPackage) => {
-      const ownPackageJSON = treeNodeForOwnPackage.value;
+    const linfraLinfraModules = _.map(treeNodeForOwnPackages, (treeNodeForOwnPackage) => {
+      const ownLinfraModule = treeNodeForOwnPackage.value;
 
       const linfraDependencies = _.map(treeNodeForOwnPackage.children, (childNode) => {
         const childPackageJson = childNode.value;
-        return {
-          name: childPackageJson.name,
-          linfra: {
-            ...childPackageJson.linfra,
-          },
-        } as Interfaces.LinfraDependency;
+        return childPackageJson;
       });
 
       return {
-        ...ownPackageJSON,
+        ...ownLinfraModule,
         linfraDeps: linfraDependencies,
       };
     });
 
-    return linfraPackageJSONs;
+    return linfraLinfraModules;
   }
 
   /**
@@ -56,15 +51,15 @@ export class Arbiter {
    * can be processed only if the previous level has been processed. Items from one level can
    * be processed concurrently.
    *
-   * @param  {Interfaces.PackageJSON[]} packageJSONs
-   * @return {Interfaces.PackageJSON[][]}
+   * @param  {Interfaces.LinfraModule[]} packageJSONs
+   * @return {Interfaces.LinfraModule[][]}
    */
   private buildPipelineLevels (
-    packageJSONs: Interfaces.PackageJSON[],
-  ): Interfaces.PackageJSON[][] {
+    packageJSONs: Interfaces.LinfraModule[],
+  ): Interfaces.LinfraModule[][] {
     const treeNodeForOwnPackages = this.buildTreeNodesOfPackages(packageJSONs);
 
-    const pipelineLevels: Interfaces.PackageJSON[][] = [];
+    const pipelineLevels: Interfaces.LinfraModule[][] = [];
     while (!_.isEmpty(treeNodeForOwnPackages)) {
       const pipelineLevelNodes = _.filter(treeNodeForOwnPackages, (treeNodeForOwnPackage) => {
         return treeNodeForOwnPackage.hasChildren() === false;
@@ -87,13 +82,13 @@ export class Arbiter {
   /**
    * Returns true if packages have circular dependencies and false otherwise.
    *
-   * @param  {Interfaces.PackageJSON[]} packageJSONs
+   * @param  {Interfaces.LinfraModule[]} packageJSONs
    * @return {boolean}
    */
   private packagesHasCircularDependencies (
-    packageJSONs: Interfaces.PackageJSON[],
+    linfraModules: Interfaces.LinfraModule[],
   ): boolean {
-    const treeNodeForOwnPackages = this.buildTreeNodesOfPackages(packageJSONs);
+    const treeNodeForOwnPackages = this.buildTreeNodesOfPackages(linfraModules);
 
     while (!_.isEmpty(treeNodeForOwnPackages)) {
       const nodeWithoutDeps = _.find(treeNodeForOwnPackages, (treeNodeForOwnPackage) => {
@@ -118,13 +113,13 @@ export class Arbiter {
    * Removes tree node of current package from the list of tree nodes of packages.
    *
    * @mutable - change the list of node's children of selected package
-   * @param  {Core.TreeModule.TreeNode<Interfaces.PackageJSON>} curTreeNode
-   * @param  {Core.TreeModule.TreeNode<Interfaces.PackageJSON>} treeNodeList
+   * @param  {Core.TreeModule.TreeNode<Interfaces.LinfraModule>} curTreeNode
+   * @param  {Core.TreeModule.TreeNode<Interfaces.LinfraModule>} treeNodeList
    * @return {void}
    */
   private removeTreeNodeFromTreeNodeList (
-    curTreeNode: Core.TreeModule.TreeNode<Interfaces.PackageJSON>,
-    treeNodeList: Core.TreeModule.TreeNode<Interfaces.PackageJSON>[],
+    curTreeNode: Core.TreeModule.TreeNode<Interfaces.LinfraModule>,
+    treeNodeList: Core.TreeModule.TreeNode<Interfaces.LinfraModule>[],
   ): void {
     _.forEach(treeNodeList, (treeNode) => {
       if (treeNode === curTreeNode) {
@@ -144,14 +139,14 @@ export class Arbiter {
   /**
    * Builds tree nodes for each package from args.
    *
-   * @param  {Interfaces.PackageJSON[]} packageJSONs
-   * @return {Core.TreeModule.TreeNode<Interfaces.PackageJSON>[]}
+   * @param  {Interfaces.LinfraModule[]} packageJSONs
+   * @return {Core.TreeModule.TreeNode<Interfaces.LinfraModule>[]}
    */
   private buildTreeNodesOfPackages (
-    packageJSONs: Interfaces.PackageJSON[],
-  ): Core.TreeModule.TreeNode<Interfaces.PackageJSON>[] {
-    const treeNodeForOwnPackages = _.map(packageJSONs, (packageJSON) => {
-      const treeNodeForOwnPackage = new TreeModule.TreeNode(packageJSON);
+    linfraModules: Interfaces.LinfraModule[],
+  ): Core.TreeModule.TreeNode<Interfaces.LinfraModule>[] {
+    const treeNodeForOwnPackages = _.map(linfraModules, (linfraModule) => {
+      const treeNodeForOwnPackage = new TreeModule.TreeNode(linfraModule);
       return treeNodeForOwnPackage;
     });
 
@@ -166,25 +161,25 @@ export class Arbiter {
    * Binds tree nodes of packages to the tree node of selected package.
    *
    * @mutable - change the list of node's children of selected package
-   * @param  {Core.TreeModule.TreeNode<Interfaces.PackageJSON>} treeNodeForCurPackage
-   * @param  {Core.TreeModule.TreeNode<Interfaces.PackageJSON>} treeNodeForOwnPackages
+   * @param  {Core.TreeModule.TreeNode<Interfaces.LinfraModule>} treeNodeForCurPackage
+   * @param  {Core.TreeModule.TreeNode<Interfaces.LinfraModule>} treeNodeForOwnPackages
    * @return {void}
    */
   private bindTreeNodesOfPackages (
-    treeNodeForCurPackage: Core.TreeModule.TreeNode<Interfaces.PackageJSON>,
-    treeNodeForOwnPackages: Core.TreeModule.TreeNode<Interfaces.PackageJSON>[],
+    treeNodeForCurPackage: Core.TreeModule.TreeNode<Interfaces.LinfraModule>,
+    treeNodeForOwnPackages: Core.TreeModule.TreeNode<Interfaces.LinfraModule>[],
   ): void {
     const curPackage = treeNodeForCurPackage.value;
 
     _.forEach(treeNodeForOwnPackages, (treeNodeForOwnPackage) => {
       const onwPackage = treeNodeForOwnPackage.value;
-      if (onwPackage.name === curPackage.name) {
+      if (onwPackage.packageJSON.name === curPackage.packageJSON.name) {
         return;
       }
 
-      const depPackagesNames = Object.keys(curPackage.dependencies);
+      const depPackagesNames = Object.keys(curPackage.packageJSON.dependencies);
       const indexOfPackage = _.findIndex(depPackagesNames, (key) => {
-        return key === onwPackage.name;
+        return key === onwPackage.packageJSON.name;
       });
 
       if (indexOfPackage === -1) {
@@ -196,21 +191,22 @@ export class Arbiter {
   }
 
   /**
-   * Extracts all package.json files from packages in a specific folder.
+   * Extracts all package.json files from packages in a specific folder and
+   * creates Linfra module for each package.
    *
    * @param  {string} folderPath - path to folder which contains packages
-   * @return {Interfaces.PackageJSON[]}
+   * @return {Interfaces.LinfraModule[]}
    */
-  private getPackageJSONFiles (
+  private getLinfraModules (
     folderPath: string,
-  ): Interfaces.PackageJSON[] {
+  ): Interfaces.LinfraModule[] {
     const packages = FSHelper.getPathsOfFoldersByPath(folderPath);
 
-    const packageJSONs: Interfaces.PackageJSON[] = [];
+    const linfraModules: Interfaces.LinfraModule[] = [];
     _.forEach(packages, (packageFolderPath) => {
-      const pathToPackageJSONInPackage = `${packageFolderPath}/package.json`;
+      const pathToLinfraModuleInPackage = `${packageFolderPath}/package.json`;
 
-      const packageJSONFile: string = NodeFS.readFileSync(pathToPackageJSONInPackage, {
+      const packageJSONFile: string = NodeFS.readFileSync(pathToLinfraModuleInPackage, {
         encoding: `utf8`,
       });
 
@@ -218,20 +214,18 @@ export class Arbiter {
         const packageJSON: Interfaces.PackageJSON = JSON.parse(packageJSONFile);
 
         const folderName = FSHelper.getFileNameByPath(packageFolderPath);
-        const packageJSONWithLinfraMetadata = {
-          ...packageJSON,
-          linfra: {
-            folderName: folderName,
-            pathToFolder: packageFolderPath,
-          },
+        const linfraModule: Interfaces.LinfraModule = {
+          folderName: folderName,
+          pathToFolder: packageFolderPath,
+          packageJSON: packageJSON,
         };
-        packageJSONs.push(packageJSONWithLinfraMetadata);
+        linfraModules.push(linfraModule);
       } catch (error) {
-        console.warn(`Arbiter - buildDependencyPipeline:`,
-          `Package JSON file (${pathToPackageJSONInPackage}) has an invalid JSON structure`);
+        console.warn(`Arbiter - getLinfraModules:`,
+          `Package JSON file (${pathToLinfraModuleInPackage}) has an invalid JSON structure`);
         return null;
       }
     });
-    return packageJSONs;
+    return linfraModules;
   }
 }
