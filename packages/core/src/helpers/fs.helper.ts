@@ -2,6 +2,10 @@ import { readdirSync, statSync } from 'fs';
 import * as NodePath from 'path';
 
 export class FSHelper {
+  static convertToAbsolutePath (path: string): string {
+    return NodePath.resolve(path);
+  }
+
   static isDirectory (path: string): boolean {
     try {
       return statSync(path).isDirectory();
