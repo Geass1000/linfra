@@ -159,6 +159,10 @@ export class PipelineBuilder {
         return;
       }
 
+      if (_.isNil(curLinfraModule.packageJSON.dependencies)) {
+        return;
+      }
+
       const depPackagesNames = Object.keys(curLinfraModule.packageJSON.dependencies);
       const indexOfPackage = _.findIndex(depPackagesNames, (depPackagesName) => {
         return depPackagesName === linfraModule.packageJSON.name;
