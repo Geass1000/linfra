@@ -34,14 +34,9 @@ export class PipelineBuilder {
    * @return {Pipeline}
    */
   buildPipeline (
-    folderPath: string,
   ): Pipeline {
-    const isFolder = FSHelper.isDirectory(folderPath);
-    if (!isFolder) {
-      throw new Error(`Folder by path doesn't exist`);
-    }
+    const linfraModules = this.linfraModules;
 
-    const linfraModules = this.getLinfraModules(folderPath);
     if (this.packagesHasCircularDependencies(linfraModules)) {
       throw new Error(`Folder has circular dependencies`);
     }
