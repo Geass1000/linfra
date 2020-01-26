@@ -176,13 +176,13 @@ export class PipelineBuilder {
   ): void {
     const curLinfraModule = curLMNode.value;
 
+    if (_.isNil(curLinfraModule.packageJSON.dependencies)) {
+      return;
+    }
+
     _.forEach(lmNodes, (lmNode) => {
       const linfraModule = lmNode.value;
       if (linfraModule.packageJSON.name === curLinfraModule.packageJSON.name) {
-        return;
-      }
-
-      if (_.isNil(curLinfraModule.packageJSON.dependencies)) {
         return;
       }
 
