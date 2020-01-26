@@ -220,9 +220,20 @@ export class PipelineBuilder {
     _.forEach(packages, (packageFolderPath) => {
       const pathToLinfraModuleInPackage = `${packageFolderPath}/package.json`;
 
-      const packageJSONFile: string = NodeFS.readFileSync(pathToLinfraModuleInPackage, {
-        encoding: `utf8`,
-      });
+      let packageJSONFile: string;
+      try {
+        packageJSONFile = NodeFS.readFileSync(pathToLinfraModuleInPackage, {
+          encoding: `utf8`,
+        });
+      } catch (error) {
+        const errorErrno = Math.abs(error.errno);
+        if (errorErrno === NodeOS.constants.errno.ENOENT) {
+          return;
+        }
+
+        console.error(`PipelineBuilder - getLinfraModules:`,
+          `Unsupported error when method reads a file`, error);
+      }
 
       try {
         const packageJSON: Interfaces.PackageJSON = JSON.parse(packageJSONFile);
