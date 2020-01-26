@@ -37,8 +37,9 @@ export class PipelineBuilder {
   ): Pipeline {
     const linfraModules = this.linfraModules;
 
-    if (this.packagesHasCircularDependencies(linfraModules)) {
-      throw new Error(`Folder has circular dependencies`);
+    const cdPath = this.findCircularDependency(linfraModules);
+    if (!_.isNil(cdPath)) {
+      throw new Error(`Folder has circular dependency (${cdPath})`);
     }
 
     const pipelineLevels = this.buildPipelineLevels(linfraModules);
@@ -84,14 +85,15 @@ export class PipelineBuilder {
   }
 
   /**
-   * Returns true if packages have circular dependencies and false otherwise.
+   * Finds circular dependency and returns path for it. If circular dependency not
+   * found, method will return null.
    *
    * @param  {Interfaces.LinfraModule[]} packageJSONs
-   * @return {boolean}
+   * @return {sting|null}
    */
-  private packagesHasCircularDependencies (
+  private findCircularDependency (
     linfraModules: Interfaces.LinfraModule[],
-  ): boolean {
+  ): string|null {
     const lmNodes = this.buildListOfLMNodes(linfraModules);
 
     while (!_.isEmpty(lmNodes)) {
@@ -101,7 +103,8 @@ export class PipelineBuilder {
       });
 
       if (_.isNil(nodeWithoutDeps)) {
-        return true;
+        const cdPath = this.buildCircularDependencyPath(lmNodes);
+        return cdPath;
       }
 
       this.removeLMNodeFromListOfLMNodes(
@@ -110,7 +113,7 @@ export class PipelineBuilder {
       );
     }
 
-    return false;
+    return null;
   }
 
   /**
