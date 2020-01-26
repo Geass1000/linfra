@@ -209,6 +209,11 @@ export class PipelineBuilder {
   private getLinfraModules (
     folderPath: string,
   ): Interfaces.LinfraModule[] {
+    const isFolder = FSHelper.isDirectory(folderPath);
+    if (!isFolder) {
+      throw new Error(`Folder by path doesn't exist`);
+    }
+
     const packages = FSHelper.getPathsOfFoldersByPath(folderPath);
 
     const linfraModules: Interfaces.LinfraModule[] = [];
