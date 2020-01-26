@@ -265,10 +265,11 @@ export class PipelineBuilder {
       try {
         const packageJSON: Interfaces.PackageJSON = JSON.parse(packageJSONFile);
 
+        const absPathToFolder = FSHelper.convertToAbsolutePath(packageFolderPath);
         const folderName = FSHelper.getFileNameByPath(packageFolderPath);
         const linfraModule: Interfaces.LinfraModule = {
           folderName: folderName,
-          pathToFolder: packageFolderPath,
+          pathToFolder: absPathToFolder,
           packageJSON: packageJSON,
         };
         linfraModules.push(linfraModule);
