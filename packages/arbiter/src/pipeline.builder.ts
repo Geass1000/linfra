@@ -1,4 +1,5 @@
 import * as NodeFS from 'fs';
+import * as NodeOS from 'os';
 import * as _ from 'lodash';
 import * as Core from '@linfra/core';
 
@@ -10,6 +11,8 @@ const FSHelper = Core.Helpers.FSHelper;
 const GraphModule = Core.GraphModule;
 
 export class PipelineBuilder {
+  private linfraModules: Interfaces.LinfraModule[];
+
   /**
    * Create instance of PipelineBuilder class.
    *
@@ -18,6 +21,10 @@ export class PipelineBuilder {
   static create (): PipelineBuilder {
     const inst = new PipelineBuilder();
     return inst;
+  }
+
+  constructor () {
+    this.linfraModules = [];
   }
 
   /**
@@ -229,5 +236,20 @@ export class PipelineBuilder {
       }
     });
     return linfraModules;
+  }
+
+  /**
+   * Adds all packages in folder to list of pipeline's modules.
+   *
+   * @param  {string} folderPath
+   * @return {void}
+   */
+  addPackagesToPipeline (
+    folderPath: string,
+  ): void {
+    const newLinfraModules = this.getLinfraModules(folderPath);
+    this.linfraModules = _.unionWith(this.linfraModules, newLinfraModules, (m1, m2) => {
+      return m1.packageJSON.name === m2.packageJSON.name;
+    });
   }
 }
