@@ -17,14 +17,18 @@
   "license": "ISC",
   "dependencies": {
     "@linfra/core": "^0.0.0",
-    "lodash": "^4.17.15"
+    "bluebird": "^3.7.2",
+    "lodash": "^4.17.15",
+    "strong-log-transformer": "^2.1.0"
   },
   "devDependencies": {
+    "@types/bluebird": "^3.5.29",
     "@types/chai": "^4.2.7",
     "@types/lodash": "^4.14.145",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.12.6",
     "@types/sinon": "^7.5.0",
+    "@types/strong-log-transformer": "^1.0.0",
     "@typescript-eslint/eslint-plugin": "^2.6.1",
     "@typescript-eslint/parser": "^2.6.1",
     "chai": "^4.2.0",
