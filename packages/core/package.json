@@ -16,6 +16,7 @@
   "author": "Andrey Shuleiko",
   "license": "ISC",
   "dependencies": {
+    "chalk": "^3.0.0",
     "lodash": "^4.17.15"
   },
   "devDependencies": {
