@@ -114,6 +114,31 @@ export class PipelineBuilder {
   }
 
   /**
+   * Creates a path for circular dependency.
+   *
+   * @param  {Core.GraphModule.GraphNode<Interfaces.LinfraModule>[]} lmNodes
+   * @return {string}
+   */
+  buildCircularDependencyPath (
+    lmNodes: Core.GraphModule.GraphNode<Interfaces.LinfraModule>[],
+  ): string {
+    let curNode = lmNodes[0];
+    const cdNodes = [ curNode ];
+
+    do {
+      curNode = curNode.children[0];
+      cdNodes.push(curNode);
+    } while (cdNodes[0] !== curNode);
+
+    const cdPartsOfPath = _.map(cdNodes, (cdNode) => {
+      const cdLinfraModule = cdNode.value;
+      return cdLinfraModule.folderName;
+    });
+
+    return _.join(cdPartsOfPath, ' -> ');
+  }
+
+  /**
    * Builds tree nodes for each package from args.
    *
    * @param  {Interfaces.LinfraModule[]} packageJSONs
