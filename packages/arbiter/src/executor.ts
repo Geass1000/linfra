@@ -1,24 +1,21 @@
 import * as NodeCP from 'child_process';
-import * as _ from 'lodash';
-import * as Bluebird from 'bluebird';
 import * as LogTransformer from 'strong-log-transformer';
 
 import * as Core from '@linfra/core';
 
-import { Pipeline } from './pipeline';
 import { Interfaces } from './shared';
 
-export class Arbiter {
-  private pipeline: Pipeline;
-  private colorManager: Core.Managers.ConsoleColorManager;
+export class Executor {
 
   /**
-   * Create instance of Arbiter class.
+   * Create instance of Executor class.
    *
-   * @return {Arbiter}
+   * @return {Executor}
    */
-  static create (): Arbiter {
-    const inst = new Arbiter();
+  static create (
+    colorManager: Core.Managers.ConsoleColorManager,
+  ): Executor {
+    const inst = new Executor(colorManager);
     return inst;
   }
 
@@ -27,45 +24,9 @@ export class Arbiter {
    *
    * @constructor
    */
-  constructor () {
-    this.colorManager = Core.Managers.ConsoleColorManager.create();
-  }
-
-  /**
-   * Sets pipeline.
-   *
-   * @param  {Pipeline} pipeline
-   * @return {void}
-   */
-  setPipeline (pipeline: Pipeline): void {
-    this.pipeline = pipeline;
-  }
-
-  /**
-   * Executes command.
-   *
-   * @param  {string} command
-   * @return {void}
-   */
-  async executeCommand (
-    command: string,
-  ): Promise<void> {
-    if (_.isNil(this.pipeline)) {
-      throw new Error (`Pipeline is not installed to the arbiter`);
-    }
-
-    const pipelineIterator = this.pipeline.getIterator();
-    for (pipelineIterator.start(); !pipelineIterator.isStopped(); pipelineIterator.next()) {
-      const pipelineLevel = pipelineIterator.value;
-
-      console.debug(`Arbiter - executeCommand: Handle level ${pipelineIterator.index}`);
-      await Bluebird.map(pipelineLevel, async (linfraModule) => {
-        await this.executeCommandForLinfraModule(
-          linfraModule,
-          command,
-        );
-      });
-    }
+  constructor (
+    private colorManager: Core.Managers.ConsoleColorManager,
+  ) {
   }
 
   /**
@@ -75,11 +36,12 @@ export class Arbiter {
    * @param  {string} command
    * @return {Promise<void>}
    */
-  private async executeCommandForLinfraModule (
+  async executeCommand (
     linfraModule: Interfaces.LinfraModule,
     command: string,
   ): Promise<void> {
-    console.debug(`Arbiter - executeCommandForPackage:`, `cd ${linfraModule.pathToFolder} && ${command}`);
+    console.debug(`Executor - executeCommandForPackage:`,
+      `cd ${linfraModule.pathToFolder} && ${command}`);
     const cp = NodeCP.exec(`cd ${linfraModule.pathToFolder} && ${command}`);
 
     this.configLoggingForChildProcess(linfraModule, cp);
