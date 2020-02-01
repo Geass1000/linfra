@@ -1,9 +1,20 @@
+import * as _ from 'lodash';
 import { readdirSync, statSync } from 'fs';
+import * as NodeFs from 'fs';
 import * as NodePath from 'path';
 
 export class FSHelper {
   static convertToAbsolutePath (path: string): string {
     return NodePath.resolve(path);
+  }
+
+  static async hasFile (path: string): Promise<boolean> {
+    try {
+      await NodeFs.promises.access(path);
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 
   static isDirectory (path: string): boolean {
