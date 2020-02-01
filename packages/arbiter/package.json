@@ -18,12 +18,14 @@
   "dependencies": {
     "@linfra/core": "^0.0.0",
     "bluebird": "^3.7.2",
+    "js-yaml": "^3.13.1",
     "lodash": "^4.17.15",
     "strong-log-transformer": "^2.1.0"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.29",
     "@types/chai": "^4.2.7",
+    "@types/js-yaml": "^3.12.2",
     "@types/lodash": "^4.14.145",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.12.6",
