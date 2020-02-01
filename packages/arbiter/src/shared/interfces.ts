@@ -13,6 +13,25 @@ export interface LinfraModule {
   packageJSON: PackageJSON;
 }
 
+export interface LinfraLernaBuildDCFilesConfig {
+  // default: /app
+  dockerWorkFolderName?: string;
+  // default: docker-compose.yml
+  dcFileName?: string;
+  // default: docker-compose.deps.yml
+  dcDepsFileName?: string;
+  // default: docker-compose.build.yml
+  dcBuildFileName?: string;
+  // default: npm run dev:build
+  dcBuildCommand?: string;
+  // default: docker-compose.watch.yml
+  dcWatchFileName?: string;
+  // default: npm run dev:watch
+  dcWatchCommand?: string;
+  // default: 1
+  concurrency: number;
+}
+
 export interface DockerComposeService {
   image: string;
   networks?: string[];
