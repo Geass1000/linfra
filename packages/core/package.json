@@ -1,7 +1,7 @@
 {
   "name": "@linfra/core",
   "version": "0.0.0",
-  "description": "Lerna Infrastructure Helper",
+  "description": "Learn Infrastructure - Core",
   "main": "./dist/index.js",
   "scripts": {
     "dev:tasks": "gulp --gulpfile=./gulp.dev.js --tasks",

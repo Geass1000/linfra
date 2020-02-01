@@ -1,7 +1,7 @@
 {
   "name": "linfra",
   "version": "0.0.0",
-  "description": "linfra",
+  "description": "Learn Infrastructure",
   "scripts": {
     "postinstall": "npm run lerna:bootstrap",
     "lerna:bootstrap": "lerna bootstrap",
