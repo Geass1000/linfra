@@ -46,7 +46,9 @@ export class GraphNode<GNData = any> {
       })
       : _.find(this._children, (child) => {
         const childData: any = child.value;
-        return childData[idFieldName] === childForFindingValue[idFieldName];
+        const childDataField = _.get(childData, idFieldName);
+        const childForFindingValueField = _.get(childForFindingValue, idFieldName);
+        return childDataField === childForFindingValueField;
       });
 
     return !_.isNil(oldChild);
