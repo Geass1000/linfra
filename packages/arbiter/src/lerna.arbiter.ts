@@ -211,4 +211,24 @@ export class LernaArbiter {
       downBuildPackageCommand,
     );
   }
+
+  /**
+   * Builds the package using Command config for Linfra Module.
+   *
+   * @param   {Interfaces.LinfraConfig} config
+   * @param   {Interfaces.LinfraModule} linfraModule
+   * @param   {Executor} executor
+   * @returns {Promise<void>}
+   */
+  async buildPackageUsingCommand (
+    config: Interfaces.LinfraConfig,
+    linfraModule: Interfaces.LinfraModule,
+    executor: Executor,
+  ): Promise<void> {
+    const buildPackageCommand = config.commandConfig.buildCommand;
+    await executor.executeCommand(
+      linfraModule,
+      buildPackageCommand,
+    );
+  }
 }
