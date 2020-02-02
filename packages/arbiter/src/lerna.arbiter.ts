@@ -118,4 +118,25 @@ export class LernaArbiter {
       `Docker Compose fiels for module '${linfraModule.folderName}' were created...`);
     return true;
   }
+
+  /**
+   * Copies all dependencies to `node_module` folder for Linfra Module.
+   *
+   * @param   {Interfaces.LinfraModule} linfraModule
+   * @returns {Promise<void>}
+   */
+  async copyDependencies (
+    linfraModule: Interfaces.LinfraModule,
+  ): Promise<void> {
+    const lmDeps = this.pipeline.getLMDependencies(linfraModule);
+    await Bluebird.map(lmDeps, async (lmDep) => {
+      const lmDepPath = lmDep.pathToFolder;
+      const destLMDepPath = `${linfraModule.pathToFolder}/node_modules/${lmDep.packageJSON.name}`;
+      console.debug(`LernaArbiter - copyDependencies`,
+        `Copy dependency from '${lmDepPath}' to '${destLMDepPath}'`);
+      await FsExtra.remove(destLMDepPath);
+      await FsExtra.copy(lmDepPath, destLMDepPath);
+      return;
+    });
+  }
 }
