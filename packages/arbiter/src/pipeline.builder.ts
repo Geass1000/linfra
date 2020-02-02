@@ -180,13 +180,14 @@ export class PipelineBuilder {
       return;
     }
 
+    const depPackagesNames = Object.keys(curLinfraModule.packageJSON.dependencies);
+
     _.forEach(lmNodes, (lmNode) => {
       const linfraModule = lmNode.value;
       if (linfraModule.packageJSON.name === curLinfraModule.packageJSON.name) {
         return;
       }
 
-      const depPackagesNames = Object.keys(curLinfraModule.packageJSON.dependencies);
       const indexOfPackage = _.findIndex(depPackagesNames, (depPackagesName) => {
         return depPackagesName === linfraModule.packageJSON.name;
       });
