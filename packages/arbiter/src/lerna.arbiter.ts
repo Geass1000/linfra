@@ -172,4 +172,43 @@ export class LernaArbiter {
       buildDockerImageCommand,
     );
   }
+
+  /**
+   * Builds the package using Docker Compose Build config for Linfra Module.
+   *
+   * @param   {Interfaces.LinfraConfig} config
+   * @param   {Interfaces.LinfraModule} linfraModule
+   * @param   {Executor} executor
+   * @returns {Promise<void>}
+   */
+  async buildPackageUsingDockerCompose (
+    config: Interfaces.LinfraConfig,
+    linfraModule: Interfaces.LinfraModule,
+    executor: Executor,
+  ): Promise<void> {
+    const dcFilePath = `${linfraModule.pathToFolder}/${config.dockerConfig.dcBuildFileName}`;
+    const hasDCFile = await Core.Helpers.FSHelper.hasFile(dcFilePath);
+    if (!hasDCFile) {
+      console.debug(`LernaArbiter - buildPackage`,
+        `Module '${linfraModule.folderName}' was skipped...`);
+      return;
+    }
+
+    const downBuildPackageCommand = `docker-compose -f ./docker-compose.build.yml down`;
+    await executor.executeCommand(
+      linfraModule,
+      downBuildPackageCommand,
+    );
+
+    const upBuildPackageCommand = `docker-compose -f ./docker-compose.build.yml up`;
+    await executor.executeCommand(
+      linfraModule,
+      upBuildPackageCommand,
+    );
+
+    await executor.executeCommand(
+      linfraModule,
+      downBuildPackageCommand,
+    );
+  }
 }
