@@ -100,7 +100,7 @@ export class LernaArbiter {
         const dcWatchFilePath = `${linfraModule.pathToFolder}/${config.dcWatchFileName}`;
         await dcConfigBuilder.saveYamlFile(dcWatchFilePath, dcWatchYaml);
         console.debug(logHeader, `Docker Compose fiels for module '${linfraModule.folderName}' were created...`);
-      });
+      }, { concurrency: config.concurrency });
     }
   }
 }
