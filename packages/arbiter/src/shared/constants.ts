@@ -1,14 +1,17 @@
 import * as Interfaces from './interfces';
 
 export namespace Default {
-  export const LinfraLernaBuildDCFilesConfig = {
+  export const LinfraDockerConfig: Interfaces.LinfraDockerConfig = {
+    imagePrefix: 'app',
     dockerWorkFolderName: '/app',
     dcFileName: 'docker-compose.yml',
     dcDepsFileName: 'docker-compose.deps.yml',
     dcBuildFileName: 'docker-compose.build.yml',
-    dcBuildCommand: 'npm run dev:build',
     dcWatchFileName: 'docker-compose.watch.yml',
-    dcWatchCommand: 'npm run dev:watch',
-    concurrency: 1,
-  } as Interfaces.LinfraLernaBuildDCFilesConfig;
+  };
+
+  export const LinfraCommandConfig: Interfaces.LinfraCommandConfig = {
+    buildCommand: 'npm run dev:build',
+    watchCommand: 'npm run dev:watch',
+  };
 }

@@ -1,6 +1,7 @@
 export interface PackageJSON {
   name: string;
-  dependencies: PackageJsonDep;
+  dependencies?: PackageJsonDep;
+  devDependencies?: PackageJsonDep;
 }
 
 export interface PackageJsonDep {
@@ -13,7 +14,16 @@ export interface LinfraModule {
   packageJSON: PackageJSON;
 }
 
-export interface LinfraLernaBuildDCFilesConfig {
+export interface LinfraCommandConfig {
+  // default: npm run dev:build
+  buildCommand?: string;
+  // default: npm run dev:watch
+  watchCommand?: string;
+}
+
+export interface LinfraDockerConfig {
+  // default: app
+  imagePrefix?: string;
   // default: /app
   dockerWorkFolderName?: string;
   // default: docker-compose.yml
@@ -22,14 +32,15 @@ export interface LinfraLernaBuildDCFilesConfig {
   dcDepsFileName?: string;
   // default: docker-compose.build.yml
   dcBuildFileName?: string;
-  // default: npm run dev:build
-  dcBuildCommand?: string;
   // default: docker-compose.watch.yml
   dcWatchFileName?: string;
-  // default: npm run dev:watch
-  dcWatchCommand?: string;
+}
+
+export interface LinfraConfig {
   // default: 1
-  concurrency: number;
+  concurrency?: number;
+  commandConfig?: LinfraCommandConfig;
+  dockerConfig?: LinfraDockerConfig;
 }
 
 export interface DockerComposeService {
