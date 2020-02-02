@@ -139,4 +139,37 @@ export class LernaArbiter {
       return;
     });
   }
+
+  /**
+   * Builds the docker image for Linfra Module.
+   *
+   * @param   {Interfaces.LinfraConfig} config
+   * @param   {Interfaces.LinfraModule} linfraModule
+   * @param   {Executor} executor
+   * @returns {Promise<void>}
+   */
+  async buildDockerImage (
+    config: Interfaces.LinfraConfig,
+    linfraModule: Interfaces.LinfraModule,
+    executor: Executor,
+  ): Promise<void> {
+    const dockerFilePath = `${linfraModule.pathToFolder}/Dockerfile`;
+    const hasDockerFile = await Core.Helpers.FSHelper.hasFile(dockerFilePath);
+    if (!hasDockerFile) {
+      console.debug(`LernaArbiter - buildDockerImage`,
+        `Module '${linfraModule.folderName}' was skipped...`);
+      return;
+    }
+
+    const tagOfDockerImage = `${config.dockerConfig.imagePrefix}.${linfraModule.folderName}:latest`;
+    const getDockerImageNameCommand = `docker images --format '{{.Repository}}:{{.Tag}}'`
+      + `| grep '${tagOfDockerImage}'`;
+    const buildDockerImageCommand = `(docker rmi $(${getDockerImageNameCommand}) --force || true) `
+      + `&& docker build . --tag=${tagOfDockerImage} || true`;
+
+    await executor.executeCommand(
+      linfraModule,
+      buildDockerImageCommand,
+    );
+  }
 }
