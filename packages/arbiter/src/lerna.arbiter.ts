@@ -124,6 +124,25 @@ export class LernaArbiter {
   }
 
   /**
+   * Removes all dependencies from `node_module` folder for Linfra Module.
+   *
+   * @param   {Interfaces.LinfraModule} linfraModule
+   * @returns {Promise<void>}
+   */
+  async removeDependencies (
+    linfraModule: Interfaces.LinfraModule,
+  ): Promise<void> {
+    const lmDeps = this.pipeline.getLMDependencies(linfraModule);
+    await Bluebird.map(lmDeps, async (lmDep) => {
+      const destLMDepPath = `${linfraModule.pathToFolder}/node_modules/${lmDep.packageJSON.name}`;
+      console.debug(`LernaArbiter - removeDependencies`,
+        `Remove '${lmDep.packageJSON.name}' dependency from '${linfraModule.packageJSON.name}'`);
+      await FsExtra.remove(destLMDepPath);
+      return;
+    });
+  }
+
+  /**
    * Copies all dependencies to `node_module` folder for Linfra Module.
    *
    * @param   {Interfaces.LinfraModule} linfraModule
