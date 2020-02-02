@@ -53,6 +53,8 @@ export class LernaArbiter {
       throw new Error (`Pipeline is not installed to the arbiter`);
     }
 
+    const logHeader = `LernaArbiter - buildDockerComposeFiles:`;
+
     const config: Interfaces.LinfraLernaBuildDCFilesConfig = _.assign(
       {}, Constants.Default.LinfraLernaBuildDCFilesConfig, userConfig,
     );
@@ -61,12 +63,13 @@ export class LernaArbiter {
     for (pipelineIterator.start(); !pipelineIterator.isStopped(); pipelineIterator.next()) {
       const pipelineLevel = pipelineIterator.value;
 
-      console.debug(`LernaArbiter - buildDockerComposeFiles:`,
-        `Handle level ${pipelineIterator.index}`);
+      console.debug(logHeader, `Handle level ${pipelineIterator.index}...`);
       await Bluebird.map(pipelineLevel, async (linfraModule) => {
+        console.debug(logHeader, `Handle module '${linfraModule.folderName}'...`);
         const dcFilePath = `${linfraModule.pathToFolder}/${config.dcFileName}`;
         const hasDCFile = await Core.Helpers.FSHelper.hasFile(dcFilePath);
         if (!hasDCFile) {
+          console.debug(logHeader, `Module '${linfraModule.folderName}' was skipped...`);
           return;
         }
 
@@ -96,6 +99,7 @@ export class LernaArbiter {
         );
         const dcWatchFilePath = `${linfraModule.pathToFolder}/${config.dcWatchFileName}`;
         await dcConfigBuilder.saveYamlFile(dcWatchFilePath, dcWatchYaml);
+        console.debug(logHeader, `Docker Compose fiels for module '${linfraModule.folderName}' were created...`);
       });
     }
   }
