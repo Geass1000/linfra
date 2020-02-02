@@ -46,10 +46,9 @@ export class DCConfigBuilder {
   createDepsYaml (
     dcYaml: Interfaces.DockerCompose,
     lmDeps: Interfaces.LinfraModule[],
-    dockerWorkFolderName: string,
   ): Interfaces.DockerCompose {
     const depsVolumes = _.map(lmDeps, (lmDep) => {
-      const pathToFile = `${lmDep.pathToFolder}:${dockerWorkFolderName}/${lmDep.folderName}`;
+      const pathToFile = `${lmDep.pathToFolder}:/${lmDep.folderName}`;
       return pathToFile;
     });
 
