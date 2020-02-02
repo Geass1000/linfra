@@ -1,4 +1,5 @@
 import * as NodeCP from 'child_process';
+import * as _ from 'lodash';
 import * as LogTransformer from 'strong-log-transformer';
 
 import * as Core from '@linfra/core';
@@ -6,6 +7,7 @@ import * as Core from '@linfra/core';
 import { Interfaces } from './shared';
 
 export class Executor {
+  private colorFn: Core.Managers.Interfaces.ConsoleColorManager.ColorFn;
 
   /**
    * Create instance of Executor class.
@@ -13,20 +15,15 @@ export class Executor {
    * @return {Executor}
    */
   static create (
-    colorManager: Core.Managers.ConsoleColorManager,
   ): Executor {
-    const inst = new Executor(colorManager);
+    const inst = new Executor();
     return inst;
   }
 
-  /**
-   * Creates instance of color manager.
-   *
-   * @constructor
-   */
-  constructor (
-    private colorManager: Core.Managers.ConsoleColorManager,
-  ) {
+  setColorFn (
+    colorFn: Core.Managers.Interfaces.ConsoleColorManager.ColorFn,
+  ): void {
+    this.colorFn = colorFn;
   }
 
   /**
@@ -64,14 +61,15 @@ export class Executor {
     linfraModule: Interfaces.LinfraModule,
     cp: NodeCP.ChildProcess,
   ): void {
-    const colorFn = this.colorManager.getColorFn();
-    this.colorManager.nextColor();
-
     const stdoutOpts = {
-      tag: `${colorFn.bold(linfraModule.packageJSON.name)}:`,
+      tag: _.isNil(this.colorFn)
+        ? linfraModule.packageJSON.name
+        : `${this.colorFn.bold(linfraModule.packageJSON.name)}:`,
     };
     const stderrOpts = {
-      tag: `${colorFn(linfraModule.packageJSON.name)}:`,
+      tag: _.isNil(this.colorFn)
+        ? linfraModule.packageJSON.name
+        : `${this.colorFn(linfraModule.packageJSON.name)}:`,
     };
 
     cp.stdout
