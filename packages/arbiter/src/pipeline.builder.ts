@@ -196,7 +196,7 @@ export class PipelineBuilder {
         return;
       }
 
-      curLMNode.addChild(lmNode, `name`);
+      curLMNode.addChild(lmNode, `packageJSON.name`);
     });
   }
 
