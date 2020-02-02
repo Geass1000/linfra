@@ -1,10 +1,12 @@
 import * as _ from 'lodash';
 import * as Chalk from 'chalk';
 
-type Colors = 'cyan' | 'magenta' | 'blue' | 'yellow' | 'green' | 'red';
+import { Interfaces } from './shared';
 
 export class ConsoleColorManager {
-  static colorList: Colors[] = [ 'cyan', 'magenta', 'blue', 'yellow', 'green', 'red' ];
+  static colorList: Interfaces.ConsoleColorManager.Colors[] = [
+    'cyan', 'magenta', 'blue', 'yellow', 'green', 'red',
+  ];
   private curColorIndex: number;
 
   /**
@@ -33,7 +35,9 @@ export class ConsoleColorManager {
       : this.curColorIndex - 1;
   }
 
-  getColorFn (userColor?: Colors): Chalk.Chalk {
+  getColorFn (
+    userColor?: Interfaces.ConsoleColorManager.Colors,
+  ): Interfaces.ConsoleColorManager.ColorFn {
     if (!_.isNil(userColor)) {
       const userColorFn = (Chalk)[userColor];
       return userColorFn;
