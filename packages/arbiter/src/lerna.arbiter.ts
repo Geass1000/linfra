@@ -41,6 +41,34 @@ export class LernaArbiter {
   }
 
   /**
+   * Combines user and default configurations.
+   *
+   * @param   {Interfaces.LinfraConfig} userConfig
+   * @returns {Interfaces.LinfraConfig}
+   */
+  buildConfig (
+    userConfig: Interfaces.LinfraConfig,
+  ): Interfaces.LinfraConfig {
+    const userDockerConfig = _.get(userConfig, 'dockerConfig');
+    const dockerConfig: Interfaces.LinfraDockerConfig = _.assign(
+      {}, Constants.Default.LinfraDockerConfig, userDockerConfig,
+    );
+
+    const userCommandConfig = _.get(userConfig, 'commandConfig');
+    const commandConfig: Interfaces.LinfraCommandConfig = _.assign(
+      {}, Constants.Default.LinfraCommandConfig, userCommandConfig,
+    );
+
+    const config: Interfaces.LinfraConfig = _.assign({
+      concurrency: 1,
+      commandConfig: commandConfig,
+      dockerConfig: dockerConfig,
+    });
+
+    return config;
+  }
+
+  /**
    * Builds a `Deps`, a `Build` and a `Watch` Docker Compose Yaml files for
    * Linfra Module.
    *
