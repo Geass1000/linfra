@@ -11,6 +11,8 @@ import { Interfaces, Constants } from './shared';
 
 export class LernaArbiter {
   private pipeline: Pipeline;
+  private colorManager: Core.Managers.ConsoleColorManager;
+  private executor: Executor;
 
   /**
    * Create instance of LernaArbiter class.
@@ -28,6 +30,8 @@ export class LernaArbiter {
    * @constructor
    */
   constructor () {
+    this.colorManager = Core.Managers.ConsoleColorManager.create();
+    this.executor = Executor.create();
   }
 
   /**
@@ -145,13 +149,11 @@ export class LernaArbiter {
    *
    * @param   {Interfaces.LinfraConfig} config
    * @param   {Interfaces.LinfraModule} linfraModule
-   * @param   {Executor} executor
    * @returns {Promise<void>}
    */
   async buildDockerImage (
     config: Interfaces.LinfraConfig,
     linfraModule: Interfaces.LinfraModule,
-    executor: Executor,
   ): Promise<void> {
     const dockerFilePath = `${linfraModule.pathToFolder}/Dockerfile`;
     const hasDockerFile = await Core.Helpers.FSHelper.hasFile(dockerFilePath);
@@ -167,7 +169,7 @@ export class LernaArbiter {
     const buildDockerImageCommand = `(docker rmi $(${getDockerImageNameCommand}) --force || true) `
       + `&& docker build . --tag=${tagOfDockerImage} || true`;
 
-    await executor.executeCommand(
+    await this.executor.executeCommand(
       linfraModule,
       buildDockerImageCommand,
     );
@@ -178,13 +180,11 @@ export class LernaArbiter {
    *
    * @param   {Interfaces.LinfraConfig} config
    * @param   {Interfaces.LinfraModule} linfraModule
-   * @param   {Executor} executor
    * @returns {Promise<void>}
    */
   async buildPackageUsingDockerCompose (
     config: Interfaces.LinfraConfig,
     linfraModule: Interfaces.LinfraModule,
-    executor: Executor,
   ): Promise<void> {
     const dcFilePath = `${linfraModule.pathToFolder}/${config.dockerConfig.dcBuildFileName}`;
     const hasDCFile = await Core.Helpers.FSHelper.hasFile(dcFilePath);
@@ -195,18 +195,18 @@ export class LernaArbiter {
     }
 
     const downBuildPackageCommand = `docker-compose -f ./docker-compose.build.yml down`;
-    await executor.executeCommand(
+    await this.executor.executeCommand(
       linfraModule,
       downBuildPackageCommand,
     );
 
     const upBuildPackageCommand = `docker-compose -f ./docker-compose.build.yml up`;
-    await executor.executeCommand(
+    await this.executor.executeCommand(
       linfraModule,
       upBuildPackageCommand,
     );
 
-    await executor.executeCommand(
+    await this.executor.executeCommand(
       linfraModule,
       downBuildPackageCommand,
     );
@@ -217,16 +217,14 @@ export class LernaArbiter {
    *
    * @param   {Interfaces.LinfraConfig} config
    * @param   {Interfaces.LinfraModule} linfraModule
-   * @param   {Executor} executor
    * @returns {Promise<void>}
    */
   async buildPackageUsingCommand (
     config: Interfaces.LinfraConfig,
     linfraModule: Interfaces.LinfraModule,
-    executor: Executor,
   ): Promise<void> {
     const buildPackageCommand = config.commandConfig.buildCommand;
-    await executor.executeCommand(
+    await this.executor.executeCommand(
       linfraModule,
       buildPackageCommand,
     );
