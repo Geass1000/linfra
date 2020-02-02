@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import * as Bluebird from 'bluebird';
+import * as FsExtra from 'fs-extra';
 
 import * as Core from '@linfra/core';
 
@@ -40,67 +41,53 @@ export class LernaArbiter {
   }
 
   /**
-   * Builds a `Deps`, a `Build` and a `Watch` Docker Compose Yaml files where
-   * packages were built by Docker Compose.
+   * Builds a `Deps`, a `Build` and a `Watch` Docker Compose Yaml files for
+   * Linfra Module.
    *
-   * @param   {Interfaces.LinfraLernaBuildDCFilesConfig} [userConfig]
-   * @returns Promise<void>
+   * @param   {Interfaces.LinfraConfig} config
+   * @param   {Interfaces.LinfraModule} linfraModule
+   * @returns {Promise<void>}
    */
   async buildDockerComposeFiles (
-    userConfig?: Interfaces.LinfraLernaBuildDCFilesConfig,
-  ): Promise<void> {
-    if (_.isNil(this.pipeline)) {
-      throw new Error (`Pipeline is not installed to the arbiter`);
+    config: Interfaces.LinfraConfig,
+    linfraModule: Interfaces.LinfraModule,
+  ): Promise<boolean> {
+    const dcFilePath = `${linfraModule.pathToFolder}/${config.dockerConfig.dcFileName}`;
+    const hasDCFile = await Core.Helpers.FSHelper.hasFile(dcFilePath);
+    if (!hasDCFile) {
+      console.debug(`LernaArbiter - buildDockerComposeFiles`,
+        `Module '${linfraModule.folderName}' was skipped...`);
+      return false;
     }
 
-    const logHeader = `LernaArbiter - buildDockerComposeFiles:`;
+    const lmDeps = this.pipeline.getLMDependencies(linfraModule);
 
-    const config: Interfaces.LinfraLernaBuildDCFilesConfig = _.assign(
-      {}, Constants.Default.LinfraLernaBuildDCFilesConfig, userConfig,
+    const dcConfigBuilder = DCConfigBuilder.create();
+    const dcBaseYaml = await dcConfigBuilder.openBaseConfigFile(dcFilePath);
+
+    const dcDepsYaml = dcConfigBuilder.createDepsYaml(
+      dcBaseYaml,
+      lmDeps,
     );
+    const dcDepsFilePath = `${linfraModule.pathToFolder}/${config.dockerConfig.dcDepsFileName}`;
+    await dcConfigBuilder.saveYamlFile(dcDepsFilePath, dcDepsYaml);
 
-    const pipelineIterator = this.pipeline.getIterator();
-    for (pipelineIterator.start(); !pipelineIterator.isStopped(); pipelineIterator.next()) {
-      const pipelineLevel = pipelineIterator.value;
+    const dcBuildYaml = dcConfigBuilder.createCommandYaml(
+      dcDepsYaml,
+      config.commandConfig.buildCommand,
+    );
+    const dcBuildFilePath = `${linfraModule.pathToFolder}/${config.dockerConfig.dcBuildFileName}`;
+    await dcConfigBuilder.saveYamlFile(dcBuildFilePath, dcBuildYaml);
 
-      console.debug(logHeader, `Handle level ${pipelineIterator.index}...`);
-      await Bluebird.map(pipelineLevel, async (linfraModule) => {
-        console.debug(logHeader, `Handle module '${linfraModule.folderName}'...`);
-        const dcFilePath = `${linfraModule.pathToFolder}/${config.dcFileName}`;
-        const hasDCFile = await Core.Helpers.FSHelper.hasFile(dcFilePath);
-        if (!hasDCFile) {
-          console.debug(logHeader, `Module '${linfraModule.folderName}' was skipped...`);
-          return;
-        }
+    const dcWatchYaml = dcConfigBuilder.createCommandYaml(
+      dcDepsYaml,
+      config.commandConfig.watchCommand,
+    );
+    const dcWatchFilePath = `${linfraModule.pathToFolder}/${config.dockerConfig.dcWatchFileName}`;
+    await dcConfigBuilder.saveYamlFile(dcWatchFilePath, dcWatchYaml);
 
-        const lmDeps = this.pipeline.getLMDependencies(linfraModule);
-
-        const dcConfigBuilder = DCConfigBuilder.create();
-        const dcBaseYaml = await dcConfigBuilder.openBaseConfigFile(dcFilePath);
-
-        const dcDepsYaml = dcConfigBuilder.createDepsYaml(
-          dcBaseYaml,
-          lmDeps,
-          config.dockerWorkFolderName,
-        );
-        const dcDepsFilePath = `${linfraModule.pathToFolder}/${config.dcDepsFileName}`;
-        await dcConfigBuilder.saveYamlFile(dcDepsFilePath, dcDepsYaml);
-
-        const dcBuildYaml = dcConfigBuilder.createCommandYaml(
-          dcDepsYaml,
-          config.dcBuildCommand,
-        );
-        const dcBuildFilePath = `${linfraModule.pathToFolder}/${config.dcBuildFileName}`;
-        await dcConfigBuilder.saveYamlFile(dcBuildFilePath, dcBuildYaml);
-
-        const dcWatchYaml = dcConfigBuilder.createCommandYaml(
-          dcDepsYaml,
-          config.dcWatchCommand,
-        );
-        const dcWatchFilePath = `${linfraModule.pathToFolder}/${config.dcWatchFileName}`;
-        await dcConfigBuilder.saveYamlFile(dcWatchFilePath, dcWatchYaml);
-        console.debug(logHeader, `Docker Compose fiels for module '${linfraModule.folderName}' were created...`);
-      }, { concurrency: config.concurrency });
-    }
+    console.debug(`LernaArbiter - buildDockerComposeFiles`,
+      `Docker Compose fiels for module '${linfraModule.folderName}' were created...`);
+    return true;
   }
 }
