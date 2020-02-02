@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import { readdirSync, statSync } from 'fs';
 import * as NodeFs from 'fs';
 import * as NodePath from 'path';
