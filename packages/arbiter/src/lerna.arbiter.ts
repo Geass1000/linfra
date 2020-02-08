@@ -353,7 +353,7 @@ export class LernaArbiter {
     const dcFilePath = `${linfraModule.pathToFolder}/${config.dockerConfig.dcBuildFileName}`;
     const hasDCFile = await Core.Helpers.FSHelper.hasFile(dcFilePath);
     if (!hasDCFile) {
-      console.debug(`LernaArbiter - buildPackage`,
+      console.debug(`LernaArbiter - buildPackageUsingDockerCompose`,
         `Module '${linfraModule.folderName}' was skipped...`);
       return;
     }
@@ -372,6 +372,62 @@ export class LernaArbiter {
       linfraModule.packageJSON.name,
     );
 
+    await this.executor.executeCommand(
+      linfraModule.pathToFolder,
+      downBuildPackageCommand,
+      linfraModule.packageJSON.name,
+    );
+  }
+
+  /**
+   * Starts watch logic for package using Docker Compose Watch config of Linfra Module.
+   *
+   * @param   {Interfaces.LinfraConfig} config
+   * @param   {Interfaces.LinfraModule} linfraModule
+   * @returns {Promise<void>}
+   */
+  async startWatchPackageUsingDockerCompose (
+    config: Interfaces.LinfraConfig,
+    linfraModule: Interfaces.LinfraModule,
+  ): Promise<void> {
+    const dcFilePath = `${linfraModule.pathToFolder}/${config.dockerConfig.dcWatchFileName}`;
+    const hasDCFile = await Core.Helpers.FSHelper.hasFile(dcFilePath);
+    if (!hasDCFile) {
+      console.debug(`LernaArbiter - startWatchPackageUsingDockerCompose`,
+        `Module '${linfraModule.folderName}' was skipped...`);
+      return;
+    }
+
+    await this.stopWatchPackageUsingDockerCompose(config, linfraModule);
+
+    const upBuildPackageCommand = `docker-compose -f ./docker-compose.watch.yml up -d`;
+    await this.executor.executeCommand(
+      linfraModule.pathToFolder,
+      upBuildPackageCommand,
+      linfraModule.packageJSON.name,
+    );
+  }
+
+  /**
+   * Stops watch logic for package using Docker Compose Watch config of Linfra Module.
+   *
+   * @param   {Interfaces.LinfraConfig} config
+   * @param   {Interfaces.LinfraModule} linfraModule
+   * @returns {Promise<void>}
+   */
+  async stopWatchPackageUsingDockerCompose (
+    config: Interfaces.LinfraConfig,
+    linfraModule: Interfaces.LinfraModule,
+  ): Promise<void> {
+    const dcFilePath = `${linfraModule.pathToFolder}/${config.dockerConfig.dcWatchFileName}`;
+    const hasDCFile = await Core.Helpers.FSHelper.hasFile(dcFilePath);
+    if (!hasDCFile) {
+      console.debug(`LernaArbiter - stopWatchPackageUsingDockerCompose`,
+        `Module '${linfraModule.folderName}' was skipped...`);
+      return;
+    }
+
+    const downBuildPackageCommand = `docker-compose -f ./docker-compose.watch.yml down`;
     await this.executor.executeCommand(
       linfraModule.pathToFolder,
       downBuildPackageCommand,
