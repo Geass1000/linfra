@@ -53,6 +53,11 @@ export class LernaArbiter {
   buildConfig (
     userConfig: Interfaces.LinfraConfig,
   ): Interfaces.LinfraConfig {
+    const userConcurrencyConfig = _.get(userConfig, 'concurrencyConfig');
+    const concurrencyConfig: Interfaces.LinfraConcurrencyConfig = _.assign(
+      {}, Constants.Default.LinfraConcurrencyConfig, userConcurrencyConfig,
+    );
+
     const userDockerConfig = _.get(userConfig, 'dockerConfig');
     const dockerConfig: Interfaces.LinfraDockerConfig = _.assign(
       {}, Constants.Default.LinfraDockerConfig, userDockerConfig,
@@ -64,7 +69,7 @@ export class LernaArbiter {
     );
 
     const config: Interfaces.LinfraConfig = _.assign({
-      concurrency: 1,
+      concurrencyConfig: concurrencyConfig,
       commandConfig: commandConfig,
       dockerConfig: dockerConfig,
     });

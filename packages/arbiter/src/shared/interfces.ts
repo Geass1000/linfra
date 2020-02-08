@@ -21,6 +21,21 @@ export interface LinfraCommandConfig {
   watchCommand?: string;
 }
 
+export interface LinfraConcurrencyConfig {
+  // default: 1
+  initPackages?: number;
+  // default: 1
+  buildLevel?: number;
+  // default: 1
+  restoreLevel?: number;
+  // default: 1
+  copyPackages?: number;
+  // default: 1
+  copyDependencies?: number;
+  // default: 1
+  removeDependencies?: number;
+}
+
 export interface LinfraDockerConfig {
   // default: app
   imagePrefix?: string;
@@ -38,7 +53,7 @@ export interface LinfraDockerConfig {
 
 export interface LinfraConfig {
   // default: 1
-  concurrency?: number;
+  concurrencyConfig?: LinfraConcurrencyConfig;
   commandConfig?: LinfraCommandConfig;
   dockerConfig?: LinfraDockerConfig;
 }

@@ -14,4 +14,12 @@ export namespace Default {
     buildCommand: 'npm run dev:build',
     watchCommand: 'npm run dev:watch',
   };
+
+  export const LinfraConcurrencyConfig: Interfaces.LinfraConcurrencyConfig = {
+    initPackages: 1,
+    buildLevel: 1,
+    restoreLevel: 1,
+    copyDependencies: 1,
+    removeDependencies: 1,
+  };
 }
