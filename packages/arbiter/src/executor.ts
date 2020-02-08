@@ -29,19 +29,23 @@ export class Executor {
   /**
    * Executes command for Linfra Module.
    *
-   * @param  {Interfaces.LinfraModule} linfraModule
+   * @param  {string} pathToFolder
+   * @param  {string} command
    * @param  {string} command
    * @return {Promise<void>}
    */
   async executeCommand (
-    linfraModule: Interfaces.LinfraModule,
+    pathToFolder: string,
     command: string,
+    userExecutorName?: string,
   ): Promise<void> {
     console.debug(`Executor - executeCommandForPackage:`,
-      `cd ${linfraModule.pathToFolder} && ${command}`);
-    const cp = NodeCP.exec(`cd ${linfraModule.pathToFolder} && ${command}`);
+      `cd ${pathToFolder} && ${command}`);
+    const cp = NodeCP.exec(`cd ${pathToFolder} && ${command}`);
 
-    this.configLoggingForChildProcess(linfraModule, cp);
+    const executorName = _.isString(userExecutorName) && userExecutorName !== ``
+      ? userExecutorName : `Executor:`;
+    this.configLoggingForChildProcess(executorName, cp);
 
     await new Promise((resolve, reject) => {
       cp.on(`exit`, () => {
@@ -53,23 +57,23 @@ export class Executor {
   /**
    * Configs logging for child process.
    *
-   * @param  {Interfaces.LinfraModule} linfraModule
+   * @param  {string} executorName
    * @param  {NodeCP.ChildProcess} cp
    * @return {void}
    */
   private configLoggingForChildProcess (
-    linfraModule: Interfaces.LinfraModule,
+    executorName: string,
     cp: NodeCP.ChildProcess,
   ): void {
     const stdoutOpts = {
       tag: _.isNil(this.colorFn)
-        ? linfraModule.packageJSON.name
-        : `${this.colorFn.bold(linfraModule.packageJSON.name)}:`,
+        ? executorName
+        : `${this.colorFn.bold(executorName)}:`,
     };
     const stderrOpts = {
       tag: _.isNil(this.colorFn)
-        ? linfraModule.packageJSON.name
-        : `${this.colorFn(linfraModule.packageJSON.name)}:`,
+        ? executorName
+        : `${this.colorFn(executorName)}:`,
     };
 
     cp.stdout
