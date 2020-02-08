@@ -194,8 +194,9 @@ export class LernaArbiter {
       + `&& docker build . --tag=${tagOfDockerImage} || true`;
 
     await this.executor.executeCommand(
-      linfraModule,
+      linfraModule.pathToFolder,
       buildDockerImageCommand,
+      linfraModule.packageJSON.name,
     );
   }
 
@@ -220,19 +221,22 @@ export class LernaArbiter {
 
     const downBuildPackageCommand = `docker-compose -f ./docker-compose.build.yml down`;
     await this.executor.executeCommand(
-      linfraModule,
+      linfraModule.pathToFolder,
       downBuildPackageCommand,
+      linfraModule.packageJSON.name,
     );
 
     const upBuildPackageCommand = `docker-compose -f ./docker-compose.build.yml up`;
     await this.executor.executeCommand(
-      linfraModule,
+      linfraModule.pathToFolder,
       upBuildPackageCommand,
+      linfraModule.packageJSON.name,
     );
 
     await this.executor.executeCommand(
-      linfraModule,
+      linfraModule.pathToFolder,
       downBuildPackageCommand,
+      linfraModule.packageJSON.name,
     );
   }
 
@@ -249,8 +253,9 @@ export class LernaArbiter {
   ): Promise<void> {
     const buildPackageCommand = config.commandConfig.buildCommand;
     await this.executor.executeCommand(
-      linfraModule,
+      linfraModule.pathToFolder,
       buildPackageCommand,
+      linfraModule.packageJSON.name,
     );
   }
 }
