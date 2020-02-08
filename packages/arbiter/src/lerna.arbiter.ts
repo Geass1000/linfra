@@ -1,9 +1,12 @@
 import * as _ from 'lodash';
 import * as Bluebird from 'bluebird';
+import * as NodeFs from 'fs';
 import * as FsExtra from 'fs-extra';
+import * as GlobParent from 'glob-parent';
 
 import * as Core from '@linfra/core';
 
+import { PipelineBuilder } from './pipeline.builder';
 import { Pipeline } from './pipeline';
 import { Executor } from './executor';
 import { DCConfigBuilder } from './dc-config.builder';
@@ -13,6 +16,7 @@ export class LernaArbiter {
   private pipeline: Pipeline;
   private colorManager: Core.Managers.ConsoleColorManager;
   private executor: Executor;
+  private pathsToLernaRepositories: string[];
 
   /**
    * Create instance of LernaArbiter class.
@@ -22,6 +26,54 @@ export class LernaArbiter {
   static create (): LernaArbiter {
     const inst = new LernaArbiter();
     return inst;
+  }
+
+  /**
+   * Creates a common Pipeline from all packages of Lerna repositories.
+   *
+   * @param   {string[]} pathsToLernaRepositories
+   * @returns {Promise<void>}
+   */
+  async setLernaRepositories (
+    pathsToLernaRepositories: string[],
+  ): Promise<void> {
+    const absPathsToLernaRepositories = _.map(pathsToLernaRepositories, (repPath) => {
+      const absRepPath = Core.Helpers.FSHelper.convertToAbsolutePath(repPath);
+      return absRepPath;
+    });
+
+    this.pathsToLernaRepositories = absPathsToLernaRepositories;
+
+    const pathsToFoldersWithPackagesByRepository = await Bluebird.map(absPathsToLernaRepositories, async (repPath) => {
+      const absPathToLernaConfig = `${repPath}/lerna.json`;
+
+      const hasLernaConfigFile = await Core.Helpers.FSHelper.hasFile(absPathToLernaConfig);
+      if (!hasLernaConfigFile) {
+        throw new Error(`Lerna config '${absPathToLernaConfig}' doesn't exist`);
+      }
+
+      const lernaConfigFile = await NodeFs.promises.readFile(absPathToLernaConfig);
+
+      const lernaConfig = JSON.parse(lernaConfigFile.toString());
+
+      const absPathsToFoldersWithPackages = _.map(lernaConfig.packages, (packagePath) => {
+        const relPathToFolderWithPackages = GlobParent(packagePath);
+        const absPathToFoldersWithPackages = `${repPath}/${relPathToFolderWithPackages}`;
+        return absPathToFoldersWithPackages;
+      });
+
+      return absPathsToFoldersWithPackages;
+    });
+
+    const pathsToFoldersWithPackages = _.flatten(pathsToFoldersWithPackagesByRepository);
+
+    const pipelineBuilder = PipelineBuilder.create();
+    _.forEach(pathsToFoldersWithPackages, (pathToFoldersWithPackages) => {
+      pipelineBuilder.addPackagesToPipeline(pathToFoldersWithPackages);
+    });
+
+    const pipeline = pipelineBuilder.buildPipeline();
+    this.pipeline = pipeline;
   }
 
   /**
