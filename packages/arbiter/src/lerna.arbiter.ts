@@ -78,6 +78,25 @@ export class LernaArbiter {
   }
 
   /**
+   * Runs the `install` and the `lerna:bootstrap` npm commands in each Lerna repository.
+   *
+   * @param   {Interfaces.LinfraConfig} config
+   * @returns {Promise<void>}
+   */
+  async initAllLernaRepositories (
+    config: Interfaces.LinfraConfig,
+  ): Promise<void> {
+    const lernaBootstrapCommand = `npm install && npm run lerna:bootstrap`;
+
+    await Bluebird.map(this.pathsToLernaRepositories, async (pathToLernaRepository) => {
+      await this.executor.executeCommand(
+        pathToLernaRepository,
+        lernaBootstrapCommand,
+      );
+    }, { concurrency: config.concurrencyConfig.initPackages });
+  }
+
+  /**
    * Builds a `Deps`, a `Build` and a `Watch` Docker Compose Yaml files for
    * Linfra Module.
    *
