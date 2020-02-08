@@ -154,6 +154,7 @@ export class LernaArbiter {
    * @returns {Promise<void>}
    */
   async removeDependencies (
+    config: Interfaces.LinfraConfig,
     linfraModule: Interfaces.LinfraModule,
   ): Promise<void> {
     const lmDeps = this.pipeline.getLMDependencies(linfraModule);
@@ -163,7 +164,7 @@ export class LernaArbiter {
         `Remove '${lmDep.packageJSON.name}' dependency from '${linfraModule.packageJSON.name}'`);
       await FsExtra.remove(destLMDepPath);
       return;
-    });
+    }, { concurrency: config.concurrencyConfig.removeDependencies });
   }
 
   /**
@@ -173,6 +174,7 @@ export class LernaArbiter {
    * @returns {Promise<void>}
    */
   async copyDependencies (
+    config: Interfaces.LinfraConfig,
     linfraModule: Interfaces.LinfraModule,
   ): Promise<void> {
     const lmDeps = this.pipeline.getLMDependencies(linfraModule);
@@ -184,7 +186,7 @@ export class LernaArbiter {
       await FsExtra.remove(destLMDepPath);
       await FsExtra.copy(lmDepPath, destLMDepPath);
       return;
-    });
+    }, { concurrency: config.concurrencyConfig.copyDependencies });
   }
 
   /**
