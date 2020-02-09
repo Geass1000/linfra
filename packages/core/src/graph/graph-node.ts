@@ -1,28 +1,20 @@
 import * as _ from 'lodash';
 
-export class TreeNode<TNData = any> {
-  private _parent!: TreeNode<TNData>;
-  public get parent (): TreeNode<TNData> {
-    return this._parent;
-  }
-  public set parent (parentNode: TreeNode<TNData>) {
-    this._parent = parentNode;
-  }
-
-  private _children!: TreeNode<TNData>[];
-  public get children (): TreeNode<TNData>[] {
+export class GraphNode<GNData = any> {
+  private _children!: GraphNode<GNData>[];
+  public get children (): GraphNode<GNData>[] {
     return [ ...this._children ];
   }
 
-  private _value: TNData;
-  public get value (): TNData {
+  private _value: GNData;
+  public get value (): GNData {
     return this._value;
   }
-  public set value (newValue: TNData) {
+  public set value (newValue: GNData) {
     this._value = newValue;
   }
 
-  constructor (value: TNData) {
+  constructor (value: GNData) {
     this._value = value;
     this._children = [];
   }
@@ -42,7 +34,7 @@ export class TreeNode<TNData = any> {
    * @return {boolean}
    */
   hasChild (
-    childForSearch: TreeNode<TNData>,
+    childForSearch: GraphNode<GNData>,
     idFieldName?: string | symbol,
   ): boolean {
     this.checkSearchParams(childForSearch, idFieldName);
@@ -54,7 +46,9 @@ export class TreeNode<TNData = any> {
       })
       : _.find(this._children, (child) => {
         const childData: any = child.value;
-        return childData[idFieldName] === childForFindingValue[idFieldName];
+        const childDataField = _.get(childData, idFieldName);
+        const childForFindingValueField = _.get(childForFindingValue, idFieldName);
+        return childDataField === childForFindingValueField;
       });
 
     return !_.isNil(oldChild);
@@ -63,12 +57,12 @@ export class TreeNode<TNData = any> {
   /**
    * Add node to the list of node's children.
    *
-   * @param  {TreeNode<TNData>} newChild
+   * @param  {GraphNode<GNData>} newChild
    * @param  {string|Symbol} [idFieldName] - name of field with id
    * @returns void
    */
   public addChild (
-    newChild: TreeNode<TNData>,
+    newChild: GraphNode<GNData>,
     idFieldName?: string | symbol,
   ): void {
     if (this.hasChild(newChild, idFieldName)) {
@@ -81,12 +75,12 @@ export class TreeNode<TNData = any> {
   /**
    * Remove node from the list of node's children.
    *
-   * @param  {TreeNode<TNData>} childForRemoving
+   * @param  {GraphNode<GNData>} childForRemoving
    * @param  {string|Symbol} [idFieldName] - name of field with id
    * @returns void
    */
   public removeChild (
-    childForRemoving: TreeNode<TNData>,
+    childForRemoving: GraphNode<GNData>,
     idFieldName?: string | symbol,
   ): void {
     this.checkSearchParams(childForRemoving, idFieldName);
@@ -108,22 +102,22 @@ export class TreeNode<TNData = any> {
   /**
    * Sets the list of node of children.
    *
-   * @param  {TreeNode[]} children
+   * @param  {GraphNode[]} children
    * @returns void
    */
-  public setChildren (children: TreeNode<TNData>[]): void {
+  public setChildren (children: GraphNode<GNData>[]): void {
     this._children = [ ...children ];
   }
 
   /**
    * Throws an error if search params are invalid.
    *
-   * @param  {TreeNode<TNData>} child
+   * @param  {GraphNode<GNData>} child
    * @param  {string|Symbol} [idFieldName] - name of field with id
    * @return {void}
    */
   private checkSearchParams (
-    child: TreeNode<TNData>,
+    child: GraphNode<GNData>,
     idFieldName?: string | symbol,
   ): void {
     if (!_.isNil(idFieldName)) {

@@ -1,7 +1,21 @@
 import { readdirSync, statSync } from 'fs';
-import { join } from 'path';
+import * as NodeFs from 'fs';
+import * as NodePath from 'path';
 
 export class FSHelper {
+  static convertToAbsolutePath (path: string): string {
+    return NodePath.resolve(path);
+  }
+
+  static async hasFile (path: string): Promise<boolean> {
+    try {
+      await NodeFs.promises.access(path);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
   static isDirectory (path: string): boolean {
     try {
       return statSync(path).isDirectory();
@@ -30,7 +44,7 @@ export class FSHelper {
 
   static getNamesOfFoldersByPath (dir: string): string[] {
     return readdirSync(dir).filter((file) => {
-      const filePath = join(dir, file);
+      const filePath = NodePath.join(dir, file);
       return FSHelper.isDirectory(filePath);
     });
   }
@@ -44,7 +58,7 @@ export class FSHelper {
 
   static getNamesOfFilesByPath (dir: string): string[] {
     return readdirSync(dir).filter((file) => {
-      const filePath = join(dir, file);
+      const filePath = NodePath.join(dir, file);
       return FSHelper.isFile(filePath);
     });
   }
@@ -58,7 +72,7 @@ export class FSHelper {
 
   static getNamesOfAllByPath (dir: string): string[] {
     return readdirSync(dir).filter((file) => {
-      const filePath = join(dir, file);
+      const filePath = NodePath.join(dir, file);
       return FSHelper.isFile(filePath) || FSHelper.isDirectory(filePath);
     });
   }

@@ -2,19 +2,17 @@
 const gulp = require(`gulp`);
 const ts = require(`gulp-typescript`);
 const mocha = require(`gulp-mocha`);
-const _ = require(`lodash`);
+
+const Core = require(`@linfra/core`);
 
 const sourceFolder = `./src`;
 const distFolder = `./dist`;
 
 const GulpCommon = require(`./gulp.common`);
 
-module.exports = _.reduce([ GulpCommon ], (partOfGulpModule, gulpFile) => {
-  return {
-    ...partOfGulpModule,
-    ...gulpFile,
-  };
-}, {});
+module.exports = Core.Helpers.GulpHelper.combineGulpFiles(
+  GulpCommon,
+);
 exports = module.exports;
 
 /**
@@ -37,7 +35,7 @@ exports[`build:src`] = gulp.series(
 
 exports[`build`] = gulp.series(
   exports[`eslint`],
-  exports[`clear:dist`],
+  exports[`clear:test`],
   exports[`build:src`],
 );
 
