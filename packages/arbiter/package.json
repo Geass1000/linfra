@@ -44,6 +44,7 @@
     "gulp-cli": "^2.2.0",
     "gulp-eslint": "^6.0.0",
     "gulp-mocha": "^7.0.2",
+    "gulp-replace": "^1.0.0",
     "gulp-typescript": "^5.0.1",
     "mocha": "^6.2.2",
     "sinon": "^7.5.0",
