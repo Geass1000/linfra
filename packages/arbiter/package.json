@@ -1,6 +1,6 @@
 {
   "name": "@linfra/arbiter",
-  "version": "0.0.0",
+  "version": "1.0.0-alpha.0",
   "description": "Learn Infrastructure - Arbiter",
   "main": "./dist/index.js",
   "scripts": {
@@ -16,7 +16,7 @@
   "author": "Andrey Shuleiko",
   "license": "ISC",
   "dependencies": {
-    "@linfra/core": "^0.0.0",
+    "@linfra/core": "^1.0.0-alpha.0",
     "bluebird": "^3.7.2",
     "fs-extra": "^8.1.0",
     "glob-parent": "^5.1.0",
