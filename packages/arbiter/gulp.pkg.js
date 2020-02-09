@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 const gulp = require(`gulp`);
 const ts = require(`gulp-typescript`);
+const replace = require('gulp-replace');
 
 const Core = require(`@linfra/core`);
 
@@ -32,8 +33,17 @@ exports[`build:src`] = gulp.series(
   exports[`move:jts`],
 );
 
+exports[`build:packageJson`] = function buildPackageJson () {
+  return gulp.src([
+    `./package.json`,
+  ])
+    .pipe(replace(/\.\/dist\/index\.js/g, './index.js'))
+    .pipe(gulp.dest(`${distFolder}`));
+};
+
 exports[`build`] = gulp.series(
   exports[`eslint`],
   exports[`clear:dist`],
   exports[`build:src`],
+  exports[`build:packageJson`],
 );
