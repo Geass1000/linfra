@@ -203,19 +203,14 @@ export class LernaArbiter {
         // Copy all Linfra Module dependencies to node_modules
         await this.copyDependencies(config, linfraModule);
 
+        // Run npm build logic for Linfra Module
+        await this.buildPackageUsingCommand(config, linfraModule);
+
+        // Remove dev dependencies from Linfra Module
+        await this.removeDevDependenciesUsingCommand(config, linfraModule);
+
         // Try to build docker image for Linfra Module
         await this.buildDockerImage(config, linfraModule);
-
-        // Try to build docker-compose files for Linfra Module
-        const dcFilesWasBuilt = await this.buildDockerComposeFiles(config, linfraModule);
-
-        if (dcFilesWasBuilt) {
-          // Run docker-compose build logic for Linfra Module
-          await this.buildPackageUsingDockerCompose(config, linfraModule);
-        } else {
-          // Run npm build logic for Linfra Module
-          await this.buildPackageUsingCommand(config, linfraModule);
-        }
 
         this.colorManager.nextColor();
       }, { concurrency: config.concurrencyConfig.buildLevel });
