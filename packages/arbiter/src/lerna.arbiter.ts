@@ -98,7 +98,7 @@ export class LernaArbiter {
     if (_.isNil(this.pipeline)) {
       throw new Error (`Pipeline is not installed to the arbiter`);
     }
-    const logHeader = `LernaArbiter - buildModules:`;
+    const logHeader = `LernaArbiter - buildLinfraModulesUsingDockerCompose:`;
 
     const config = this.buildConfig(userConfig);
 
@@ -160,7 +160,7 @@ export class LernaArbiter {
     if (_.isNil(this.pipeline)) {
       throw new Error (`Pipeline is not installed to the arbiter`);
     }
-    const logHeader = `LernaArbiter - buildModules:`;
+    const logHeader = `LernaArbiter - buildLinfraModules:`;
 
     const config = this.buildConfig(userConfig);
 
@@ -217,7 +217,7 @@ export class LernaArbiter {
     if (_.isNil(this.pipeline)) {
       throw new Error (`Pipeline is not installed to the arbiter`);
     }
-    const logHeader = `LernaArbiter - startDockerContainers:`;
+    const logHeader = `LernaArbiter - startAllDockerServices:`;
 
     const config = this.buildConfig(userConfig);
 
@@ -268,7 +268,7 @@ export class LernaArbiter {
     if (_.isNil(this.pipeline)) {
       throw new Error (`Pipeline is not installed to the arbiter`);
     }
-    const logHeader = `LernaArbiter - stopDockerContainers:`;
+    const logHeader = `LernaArbiter - stopAllDockerServices:`;
 
     const config = this.buildConfig(userConfig);
 
