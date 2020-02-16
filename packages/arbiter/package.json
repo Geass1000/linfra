@@ -1,6 +1,6 @@
 {
   "name": "@linfra/arbiter",
-  "version": "2.0.0-alpha.0",
+  "version": "2.0.1-alpha.0",
   "description": "Learn Infrastructure - Arbiter",
   "main": "./dist/index.js",
   "scripts": {
