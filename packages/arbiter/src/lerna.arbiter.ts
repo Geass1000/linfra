@@ -104,7 +104,7 @@ export class LernaArbiter {
 
     // Inits each Lerna repository using Lerna Bootstrap logic
     console.debug(logHeader, `Run Lerna Bootstrap commands in each lerna repository...`);
-    await this.initAllLernaRepositories(config);
+    await this.initAllLinfraModules(config);
 
     // Run build sequence of Pipeline levels
     const pipelineIterator = this.pipeline.getIterator();
@@ -144,23 +144,8 @@ export class LernaArbiter {
       }, { concurrency: config.concurrencyConfig.buildLevel });
     }
 
-    // Remove copies of dependencies from node_modules in each Linfra Module
-    for (pipelineIterator.restart(); !pipelineIterator.isStopped(); pipelineIterator.next()) {
-      const pipelineLevel = pipelineIterator.value;
-
-      console.debug(logHeader, `Handle level ${pipelineIterator.index}`);
-      await Bluebird.map(pipelineLevel, async (linfraModule) => {
-        const colorFn = this.colorManager.getColorFn();
-        this.executor.setColorFn(colorFn);
-
-        console.debug(logHeader, `Handle module ${colorFn.bold(linfraModule.folderName)}`);
-        await this.removeDependencies(config, linfraModule);
-        this.colorManager.nextColor();
-      }, { concurrency: config.concurrencyConfig.restoreLevel });
-    }
-
-    // Resotre links to Linfra Modules using Lerna Bootstrap logic
-    await this.initAllLernaRepositories(config);
+    // Reinit All Linfra Modules
+    await this.reinitAllLinfraModules(config);
   }
 
   /**
@@ -181,7 +166,7 @@ export class LernaArbiter {
 
     // Inits each Lerna repository using Lerna Bootstrap logic
     console.debug(logHeader, `Run Lerna Bootstrap commands in each lerna repository...`);
-    await this.initAllLernaRepositories(config);
+    await this.initAllLinfraModules(config);
 
     // Run build sequence of Pipeline levels
     const pipelineIterator = this.pipeline.getIterator();
@@ -216,23 +201,8 @@ export class LernaArbiter {
       }, { concurrency: config.concurrencyConfig.buildLevel });
     }
 
-    // Remove copies of dependencies from node_modules in each Linfra Module
-    for (pipelineIterator.restart(); !pipelineIterator.isStopped(); pipelineIterator.next()) {
-      const pipelineLevel = pipelineIterator.value;
-
-      console.debug(logHeader, `Handle level ${pipelineIterator.index}`);
-      await Bluebird.map(pipelineLevel, async (linfraModule) => {
-        const colorFn = this.colorManager.getColorFn();
-        this.executor.setColorFn(colorFn);
-
-        console.debug(logHeader, `Handle module ${colorFn.bold(linfraModule.folderName)}`);
-        await this.removeDependencies(config, linfraModule);
-        this.colorManager.nextColor();
-      }, { concurrency: config.concurrencyConfig.restoreLevel });
-    }
-
-    // Resotre links to Linfra Modules using Lerna Bootstrap logic
-    await this.initAllLernaRepositories(config);
+    // Reinit All Linfra Modules
+    await this.reinitAllLinfraModules(config);
   }
 
   /**
@@ -252,7 +222,7 @@ export class LernaArbiter {
     const config = this.buildConfig(userConfig);
 
     console.debug(logHeader, `Run Lerna Bootstrap commands in each lerna repository...`);
-    await this.initAllLernaRepositories(config);
+    await this.initAllLinfraModules(config);
 
     // Run build sequence of Pipeline levels
     const pipelineIterator = this.pipeline.getIterator();
