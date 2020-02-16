@@ -92,6 +92,83 @@ export class LernaArbiter {
    * @param   {Interfaces.LinfraConfig} [userConfig]
    * @returns {Promise<void>}
    */
+  async buildLinfraModulesUsingDockerCompose (
+    userConfig?: Interfaces.LinfraConfig,
+  ): Promise<void> {
+    if (_.isNil(this.pipeline)) {
+      throw new Error (`Pipeline is not installed to the arbiter`);
+    }
+    const logHeader = `LernaArbiter - buildModules:`;
+
+    const config = this.buildConfig(userConfig);
+
+    // Inits each Lerna repository using Lerna Bootstrap logic
+    console.debug(logHeader, `Run Lerna Bootstrap commands in each lerna repository...`);
+    await this.initAllLernaRepositories(config);
+
+    // Run build sequence of Pipeline levels
+    const pipelineIterator = this.pipeline.getIterator();
+    for (pipelineIterator.start(); !pipelineIterator.isStopped(); pipelineIterator.next()) {
+      const pipelineLevel = pipelineIterator.value;
+
+      console.debug(logHeader, `Handle level ${pipelineIterator.index} with ${pipelineLevel.length} Linfra Module`);
+
+      // Run build sequence of each Linfra Module in Pipeline level
+      let numModulesInProgress = 0;
+      await Bluebird.map(pipelineLevel, async (linfraModule) => {
+        numModulesInProgress++;
+        // Get colorizer function for each module
+        const colorFn = this.colorManager.getColorFn();
+        this.executor.setColorFn(colorFn);
+
+        console.debug(logHeader, `Handle module ${colorFn.bold(linfraModule.folderName)} (${numModulesInProgress})`);
+
+        // Copy all Linfra Module dependencies to node_modules
+        await this.copyDependencies(config, linfraModule);
+
+        // Try to build docker image for Linfra Module
+        await this.buildDockerImage(config, linfraModule);
+
+        // Try to build docker-compose files for Linfra Module
+        const dcFilesWasBuilt = await this.buildDockerComposeFiles(config, linfraModule);
+
+        if (dcFilesWasBuilt) {
+          // Run docker-compose build logic for Linfra Module
+          await this.buildPackageUsingDockerCompose(config, linfraModule);
+        } else {
+          // Run npm build logic for Linfra Module
+          await this.buildPackageUsingCommand(config, linfraModule);
+        }
+
+        this.colorManager.nextColor();
+      }, { concurrency: config.concurrencyConfig.buildLevel });
+    }
+
+    // Remove copies of dependencies from node_modules in each Linfra Module
+    for (pipelineIterator.restart(); !pipelineIterator.isStopped(); pipelineIterator.next()) {
+      const pipelineLevel = pipelineIterator.value;
+
+      console.debug(logHeader, `Handle level ${pipelineIterator.index}`);
+      await Bluebird.map(pipelineLevel, async (linfraModule) => {
+        const colorFn = this.colorManager.getColorFn();
+        this.executor.setColorFn(colorFn);
+
+        console.debug(logHeader, `Handle module ${colorFn.bold(linfraModule.folderName)}`);
+        await this.removeDependencies(config, linfraModule);
+        this.colorManager.nextColor();
+      }, { concurrency: config.concurrencyConfig.restoreLevel });
+    }
+
+    // Resotre links to Linfra Modules using Lerna Bootstrap logic
+    await this.initAllLernaRepositories(config);
+  }
+
+  /**
+   * Builds the all Linfra Modules.
+   *
+   * @param   {Interfaces.LinfraConfig} [userConfig]
+   * @returns {Promise<void>}
+   */
   async buildLinfraModules (
     userConfig?: Interfaces.LinfraConfig,
   ): Promise<void> {
