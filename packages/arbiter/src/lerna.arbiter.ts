@@ -272,6 +272,9 @@ export class LernaArbiter {
 
         console.debug(logHeader, `Handle module ${colorFn.bold(linfraModule.folderName)} (${numModulesInProgress})`);
 
+        // Try to build docker-compose files for Linfra Module
+        await this.buildDockerComposeFiles(config, linfraModule);
+
         // Run docker-compose build logic for Linfra Module
         await this.buildPackageUsingDockerCompose(config, linfraModule);
 
