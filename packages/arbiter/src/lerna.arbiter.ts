@@ -144,8 +144,10 @@ export class LernaArbiter {
       }, { concurrency: config.concurrencyConfig.buildLevel });
     }
 
-    // Reinit All Linfra Modules
-    await this.reinitAllLinfraModules(config);
+    if (config.build.skipRestoreStep === false) {
+      // Reinit All Linfra Modules
+      await this.reinitAllLinfraModules(config);
+    }
   }
 
   /**
@@ -201,8 +203,10 @@ export class LernaArbiter {
       }, { concurrency: config.concurrencyConfig.buildLevel });
     }
 
-    // Reinit All Linfra Modules
-    await this.reinitAllLinfraModules(config);
+    if (config.build.skipRestoreStep === false) {
+      // Reinit All Linfra Modules
+      await this.reinitAllLinfraModules(config);
+    }
   }
 
   /**
