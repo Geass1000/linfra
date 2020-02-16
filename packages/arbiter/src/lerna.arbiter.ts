@@ -621,4 +621,23 @@ export class LernaArbiter {
       linfraModule.packageJSON.name,
     );
   }
+
+  /**
+   * Removes all dev-dependencies from Linfra Module.
+   *
+   * @param   {Interfaces.LinfraConfig} config
+   * @param   {Interfaces.LinfraModule} linfraModule
+   * @returns {Promise<void>}
+   */
+  async removeDevDependenciesUsingCommand (
+    config: Interfaces.LinfraConfig,
+    linfraModule: Interfaces.LinfraModule,
+  ): Promise<void> {
+    const removeDevDependenciesFromPackageCommand = `npm prune --production`;
+    await this.executor.executeCommand(
+      linfraModule.pathToFolder,
+      removeDevDependenciesFromPackageCommand,
+      linfraModule.packageJSON.name,
+    );
+  }
 }
