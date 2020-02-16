@@ -322,7 +322,13 @@ export class LernaArbiter {
       {}, Constants.Default.LinfraCommandConfig, userCommandConfig,
     );
 
+    const userBuildConfig = _.get(userConfig, 'build');
+    const buildConfig: Interfaces.LinfraBuildConfig = _.assign(
+      {}, Constants.Default.LinfraBuildConfig, userBuildConfig,
+    );
+
     const config: Interfaces.LinfraConfig = _.assign({
+      build: buildConfig,
       concurrencyConfig: concurrencyConfig,
       commandConfig: commandConfig,
       dockerConfig: dockerConfig,

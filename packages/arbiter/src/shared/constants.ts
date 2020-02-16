@@ -24,4 +24,8 @@ export namespace Default {
     copyDependencies: 1,
     removeDependencies: 1,
   };
+
+  export const LinfraBuildConfig: Interfaces.LinfraBuildConfig = {
+    skipRestoreStep: false,
+  };
 }

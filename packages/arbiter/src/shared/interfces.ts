@@ -14,6 +14,11 @@ export interface LinfraModule {
   packageJSON: PackageJSON;
 }
 
+export interface LinfraBuildConfig {
+  // default: npm run dev:build
+  skipRestoreStep?: boolean;
+}
+
 export interface LinfraCommandConfig {
   // default: npm run dev:build
   buildCommand?: string;
@@ -56,6 +61,7 @@ export interface LinfraDockerConfig {
 }
 
 export interface LinfraConfig {
+  build?: LinfraBuildConfig;
   // default: 1
   concurrencyConfig?: LinfraConcurrencyConfig;
   commandConfig?: LinfraCommandConfig;
