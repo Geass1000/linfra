@@ -17,6 +17,8 @@ export namespace Default {
 
   export const LinfraConcurrencyConfig: Interfaces.LinfraConcurrencyConfig = {
     initPackages: 1,
+    startLevel: 1,
+    stopLevel: 1,
     buildLevel: 1,
     restoreLevel: 1,
     copyDependencies: 1,

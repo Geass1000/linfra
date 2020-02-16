@@ -25,6 +25,10 @@ export interface LinfraConcurrencyConfig {
   // default: 1
   initPackages?: number;
   // default: 1
+  startLevel?: number;
+  // default: 1
+  stopLevel?: number;
+  // default: 1
   buildLevel?: number;
   // default: 1
   restoreLevel?: number;

@@ -252,7 +252,7 @@ export class LernaArbiter {
         await this.startWatchPackageUsingDockerCompose(config, linfraModule);
 
         this.colorManager.nextColor();
-      }, { concurrency: config.concurrencyConfig.buildLevel });
+      }, { concurrency: config.concurrencyConfig.startLevel });
     }
   }
 
@@ -294,7 +294,7 @@ export class LernaArbiter {
         await this.stopWatchPackageUsingDockerCompose(config, linfraModule);
 
         this.colorManager.nextColor();
-      }, { concurrency: config.concurrencyConfig.buildLevel });
+      }, { concurrency: config.concurrencyConfig.stopLevel });
     }
   }
 
