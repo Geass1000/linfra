@@ -44,7 +44,7 @@ export class Executor {
     const cp = NodeCP.exec(`cd ${pathToFolder} && ${command}`);
 
     const executorName = _.isString(userExecutorName) && userExecutorName !== ``
-      ? userExecutorName : `Executor:`;
+      ? userExecutorName : `Executor`;
     this.configLoggingForChildProcess(executorName, cp);
 
     await new Promise((resolve, reject) => {

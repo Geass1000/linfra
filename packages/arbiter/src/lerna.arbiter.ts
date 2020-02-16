@@ -362,6 +362,50 @@ export class LernaArbiter {
   }
 
   /**
+   * Removes copies of dependencies from node_modules in each Linfra Module and
+   * calls `Init All Linfra Modules` logic.
+   *
+   * @param   {Interfaces.LinfraConfig} config
+   * @returns {Promise<void>}
+   */
+  async reinitAllLinfraModules (
+    config: Interfaces.LinfraConfig,
+  ): Promise<void> {
+    const logHeader = `LernaArbiter - reinitAllLinfraModules:`;
+
+    const pipelineIterator = this.pipeline.getIterator();
+    // Remove copies of dependencies from node_modules in each Linfra Module
+    for (pipelineIterator.start(); !pipelineIterator.isStopped(); pipelineIterator.next()) {
+      const pipelineLevel = pipelineIterator.value;
+
+      console.debug(logHeader, `Handle level ${pipelineIterator.index}`);
+      await Bluebird.map(pipelineLevel, async (linfraModule) => {
+        const colorFn = this.colorManager.getColorFn();
+        this.executor.setColorFn(colorFn);
+
+        console.debug(logHeader, `Handle module ${colorFn.bold(linfraModule.folderName)}`);
+        await this.removeDependencies(config, linfraModule);
+        this.colorManager.nextColor();
+      }, { concurrency: config.concurrencyConfig.restoreLevel });
+    }
+
+    // Resotre links to Linfra Modules using Lerna Bootstrap logic
+    await this.initAllLinfraModules(config);
+  }
+
+  /**
+   * Inits all Linfra Modules.
+   *
+   * @param   {Interfaces.LinfraConfig} config
+   * @returns {Promise<void>}
+   */
+  async initAllLinfraModules (
+    config: Interfaces.LinfraConfig,
+  ): Promise<void> {
+    await this.initAllLernaRepositories(config);
+  }
+
+  /**
    * Runs the `install` and the `lerna:bootstrap` npm commands in each Lerna repository.
    *
    * @param   {Interfaces.LinfraConfig} config
