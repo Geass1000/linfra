@@ -6,6 +6,7 @@
     "postinstall": "npm run lerna:bootstrap",
     "lerna:bootstrap": "lerna bootstrap",
     "lerna:clean": "lerna clean --yes",
+    "lerna:publish": "lerna publish from-package --yes --contents dist",
     "gulp:tasks": "gulp --tasks",
     "dev:build": "lerna run --parallel dev:build --scope @linfra/core && lerna run --parallel dev:build --ignore @linfra/core",
     "dev:watch": "npm run dev:build && lerna run --parallel dev:watch",
