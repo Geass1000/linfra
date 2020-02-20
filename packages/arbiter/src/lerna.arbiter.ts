@@ -196,6 +196,9 @@ export class LernaArbiter {
         // Remove dev dependencies from Linfra Module
         await this.removeDevDependenciesUsingCommand(config, linfraModule);
 
+        // Copy all Linfra Module dependencies to node_modules
+        await this.copyDependencies(config, linfraModule);
+
         // Try to build docker image for Linfra Module
         await this.buildDockerImage(config, linfraModule);
 
